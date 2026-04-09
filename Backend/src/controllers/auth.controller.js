@@ -2,7 +2,6 @@ import userModel from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/config.js'
 import bcrypt from 'bcryptjs'
-
 function generateToken(user) {
     return jwt.sign({
         id: user._id,
@@ -13,7 +12,11 @@ function generateToken(user) {
         }
     )
 }
-
+/*
+    @desc Register a new user
+    @route POST /api/auth/register
+    @access Public
+*/
 export async function registerController(req, res) {
     const { email, contact, password, fullName, profilePicture } = req.body
     try {
@@ -59,7 +62,11 @@ export async function registerController(req, res) {
     }
 
 }
-
+/*
+    @desc login user
+    @route POST /api/auth/login
+    @access Public
+*/
 export async function loginController(req, res) {
     const { email, password,contact } = req.body
     try {
@@ -83,9 +90,10 @@ export async function loginController(req, res) {
             message:"Password is invalid"
         })
      }
-     
+
 
         const token = generateToken(user)
+      
         res.cookie("token", token)
         return res.status(200).json({
             message: "user loggedin successfully",
@@ -101,8 +109,37 @@ export async function loginController(req, res) {
     catch (error) {
         console.log(error)
         return res.status(500).json({
-            message: "Server Error"
+            message: "Server aa rha hai Error"
         })
     }
 
+}
+
+/*
+    @desc Get user profile
+    @route POST /api/auth/get-me
+    @access private
+*/
+
+export async function getMeController(req,res){
+
+    try{
+        const userId = req.user.id
+        const user  = await userModel.findById(userId)
+
+        return res.status(200).json({
+            user:{
+                email:user.email,
+                contact:user.contact,
+                fullName:user.fullName,
+                profilePicture:user.profilePicture
+            }
+        })
+    }
+
+    catch(error){
+        return res.status(500).json({
+            message:"Server  Error"
+        })
+    }
 }
