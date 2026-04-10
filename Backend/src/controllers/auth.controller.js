@@ -1,6 +1,8 @@
+import crypto from 'crypto'
 import userModel from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/config.js'
+import { sendVerificationEmail } from '../utils/sendEmail.js'
 import bcrypt from 'bcryptjs'
 function generateToken(user) {
     return jwt.sign({
@@ -40,10 +42,17 @@ export async function registerController(req, res) {
             profilePicture
         })
 
+        const verificationToken = crypto.randomBytes(32).toString('hex')
+        const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        user.verificationToken = verificationToken
+        user.verificationTokenExpiry = verificationTokenExpiry
+        await user.save({ validateBeforeSave: false })
+        const verificationLink = `${config.CLIENT_URL}/verify-email?token=${verificationToken}`
+        await sendVerificationEmail(user.email, verificationLink)
         const token = generateToken(user)
         res.cookie("token", token)
         return res.status(201).json({
-            message: "User registered successfully",
+            message: "Registration successful! Please verify your email.",
             user: {
                 id: user._id,
                 contact: user.contact,
@@ -68,13 +77,13 @@ export async function registerController(req, res) {
     @access Public
 */
 export async function loginController(req, res) {
-    const { email, password,contact } = req.body
+    const { email, password, contact } = req.body
     try {
 
         const user = await userModel.findOne({
-            $or:[
-                {email},
-                {contact}
+            $or: [
+                { email },
+                { contact }
             ]
         })
         if (!user) {
@@ -82,18 +91,17 @@ export async function loginController(req, res) {
                 message: "User not found "
             })
         }
+        const isMatch = await user.comparePassword(password)
 
-     const isMatch = await bcrypt.compare(password,user.password)
-
-     if(!isMatch){
-        return res.status(400).json({
-            message:"Password is invalid"
-        })
-     }
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Password is invalid"
+            })
+        }
 
 
         const token = generateToken(user)
-      
+
         res.cookie("token", token)
         return res.status(200).json({
             message: "user loggedin successfully",
@@ -109,7 +117,7 @@ export async function loginController(req, res) {
     catch (error) {
         console.log(error)
         return res.status(500).json({
-            message: "Server aa rha hai Error"
+            message: "Server  Error"
         })
     }
 
@@ -121,25 +129,103 @@ export async function loginController(req, res) {
     @access private
 */
 
-export async function getMeController(req,res){
+export async function getMeController(req, res) {
 
-    try{
+    try {
         const userId = req.user.id
-        const user  = await userModel.findById(userId)
+        const user = await userModel.findById(userId)
 
         return res.status(200).json({
-            user:{
-                email:user.email,
-                contact:user.contact,
-                fullName:user.fullName,
-                profilePicture:user.profilePicture
+            user: {
+                email: user.email,
+                contact: user.contact,
+                fullName: user.fullName,
+                profilePicture: user.profilePicture
             }
         })
     }
 
-    catch(error){
+    catch (error) {
         return res.status(500).json({
-            message:"Server  Error"
+            message: "Server  Error"
         })
     }
+}
+
+
+/*
+    @desc Verify email
+    @route GET /api/auth/verify-email?token=xxxx
+    @access Public
+*/
+export async function verifyEmailController(req, res) {
+    const { token } = req.query
+    try {
+        // Step 1: Token se user dhundo
+        const user = await userModel.findOne({
+            verificationToken: token,
+            verificationTokenExpiry: { $gt: new Date() }  // expiry check
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid or expired verification token"
+            })
+        }
+
+        user.isVerified = true
+        user.verificationToken = null
+        user.verificationTokenExpiry = null
+        await user.save({ validateBeforeSave: false })
+        return res.status(200).json({
+            message: "Email verified successfully!"
+        })
+
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Server  Error"
+        })
+    }
+}
+
+/*
+@desc resend verification email
+@route POST /api/auth/resend-verification-email
+@access Private
+*/
+
+export async function resendVerificationEmailController(req, res) {
+const {email} = req.body
+console.log(email)
+try{
+
+    const user  = await userModel.findOne({email})
+    if(!user){
+        return res.status(404).json({
+            message:"User not found"
+        })
+    }
+    if(user.isVerified){
+        return res.status(400).json({
+            message:"Email is already verified"
+        })
+    }
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    user.verificationToken = verificationToken
+    user.verificationTokenExpiry = verificationTokenExpiry
+    await user.save({validateBeforeSave:false})
+    const verificationLink = `${config.CLIENT_URL}/verify-email?token=${verificationToken}`
+    await sendVerificationEmail(user.email,verificationLink)
+    return res.status(200).json({
+        message:"Verification email resent successfully"
+    })
+}
+catch(error){
+    return res.status(500).json({
+        message:"Server Error"
+    })
+}
+
 }

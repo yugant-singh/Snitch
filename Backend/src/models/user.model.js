@@ -26,7 +26,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["buyer", "seller"],
         default: "buyer"
-    }
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
+    verificationToken:{
+        type:String,
+        default:null
+    },
+    verificationTokenExpiry: {
+    type: Date,
+    default: null
+}
 })
 
 userSchema.pre("save", async function () {
