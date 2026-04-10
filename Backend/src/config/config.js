@@ -19,10 +19,23 @@ if(!process.env.EMAIL_PASS){
 if(!process.env.CLIENT_URL){
     throw new Error("CLIENT_URL is not defined in .env file")
 }
+
+if(!process.env.URL_END_POINT){
+    throw new Error("URL_END_POINT is not defined in .env file")
+}
+if(!process.env.IAMGE_KIT_PUBLIC_KEY){
+    throw new Error("IAMGE_KIT_PUBLIC_KEY is not defined in .env file")
+}
+if(!process.env.IAMGE_KIT_PRIVATE_KEY){
+    throw new Error("IAMGE_KIT_PRIVATE_KEY is not defined in .env file")
+}
 export const config = {
     MONGO_URI:process.env.MONGO_URI,
     JWT_SECRET:process.env.JWT_SECRET,
     EMAIL_USER:process.env.EMAIL_USER,
     EMAIL_PASS:process.env.EMAIL_PASS,
-    CLIENT_URL:process.env.CLIENT_URL
+    CLIENT_URL:process.env.CLIENT_URL,
+    URL_END_POINT:process.env.URL_END_POINT,
+    IAMGE_KIT_PUBLIC_KEY:process.env.IAMGE_KIT_PUBLIC_KEY,
+    IAMGE_KIT_PRIVATE_KEY:process.env.IAMGE_KIT_PRIVATE_KEY
 }

@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import userModel from '../models/user.model.js'
+import { imagekit } from '../utils/imagekit.js'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/config.js'
 import { sendVerificationEmail } from '../utils/sendEmail.js'
@@ -50,7 +51,7 @@ export async function registerController(req, res) {
         const verificationLink = `${config.CLIENT_URL}/verify-email?token=${verificationToken}`
         await sendVerificationEmail(user.email, verificationLink)
         const token = generateToken(user)
-        res.cookie("token", token)
+
         return res.status(201).json({
             message: "Registration successful! Please verify your email.",
             user: {
@@ -60,7 +61,7 @@ export async function registerController(req, res) {
                 fullName: user.fullName
 
             },
-            token
+
         })
     }
     catch (error) {
@@ -99,6 +100,11 @@ export async function loginController(req, res) {
             })
         }
 
+        if (!user.isVerified) {
+            return res.status(400).json({
+                message: "'Please verify your email before logging in'"
+            })
+        }
 
         const token = generateToken(user)
 
@@ -152,7 +158,6 @@ export async function getMeController(req, res) {
     }
 }
 
-
 /*
     @desc Verify email
     @route GET /api/auth/verify-email?token=xxxx
@@ -196,36 +201,85 @@ export async function verifyEmailController(req, res) {
 */
 
 export async function resendVerificationEmailController(req, res) {
-const {email} = req.body
-console.log(email)
-try{
+    const { email } = req.body
+    console.log(email)
+    try {
 
-    const user  = await userModel.findOne({email})
-    if(!user){
-        return res.status(404).json({
-            message:"User not found"
+        const user = await userModel.findOne({ email })
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+        if (user.isVerified) {
+            return res.status(400).json({
+                message: "Email is already verified"
+            })
+        }
+        const verificationToken = crypto.randomBytes(32).toString('hex')
+        const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        user.verificationToken = verificationToken
+        user.verificationTokenExpiry = verificationTokenExpiry
+        await user.save({ validateBeforeSave: false })
+        const verificationLink = `${config.CLIENT_URL}/verify-email?token=${verificationToken}`
+        await sendVerificationEmail(user.email, verificationLink)
+        return res.status(200).json({
+            message: "Verification email resent successfully"
         })
     }
-    if(user.isVerified){
-        return res.status(400).json({
-            message:"Email is already verified"
+    catch (error) {
+        return res.status(500).json({
+            message: "Server Error"
         })
     }
-    const verificationToken = crypto.randomBytes(32).toString('hex')
-    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
-    user.verificationToken = verificationToken
-    user.verificationTokenExpiry = verificationTokenExpiry
-    await user.save({validateBeforeSave:false})
-    const verificationLink = `${config.CLIENT_URL}/verify-email?token=${verificationToken}`
-    await sendVerificationEmail(user.email,verificationLink)
-    return res.status(200).json({
-        message:"Verification email resent successfully"
-    })
-}
-catch(error){
-    return res.status(500).json({
-        message:"Server Error"
-    })
+
 }
 
+/*
+@desc resend update user profile
+@route POST /api/auth/profilePicture
+@access Private
+*/
+export async function updateProfileController(req, res) {
+
+    try {
+        const userId = req.user.id
+        const { contact, fullName } = req.body
+        const user = await userModel.findById(userId)
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        if (fullName) user.fullName = fullName
+        if (contact) user.contact = contact
+
+        if (req.file) {
+            const uploadImage = await imagekit.upload({
+                file: req.file.buffer,
+                fileName: Date.now() + "-" + req.file.originalname,
+                folder: "snitch/profile_pictures"
+            })
+               user.profilePicture=uploadImage.url
+        }
+
+     
+        await user.save()
+
+        return res.status(200).json({
+            message:"Profile updated successfully",
+            user:{
+                email:user.email,
+                fullName:user.fullName,
+                contact:user.contact,
+                profilePicture:user.profilePicture
+            }
+        })
+    }
+     catch (error) {
+        return res.status(500).json({
+            message: error.message
+        })
+    }
 }
