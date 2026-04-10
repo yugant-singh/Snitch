@@ -39,6 +39,13 @@ if(!process.env.REDIS_PORT){
 if(!process.env.REDIS_PASSWORD){
     throw new Error("REDIS_PASSWORD is not defined in .env file")
 }
+if(!process.env.CLIENT_ID){
+    throw new Error("CLIENT_ID is not defined in .env file")
+}
+if(!process.env.CLIENT_SECRET){ 
+    throw new Error("CLIENT_SECRET is not defined in .env file")
+}
+
 
 export const config = {
     MONGO_URI:process.env.MONGO_URI,
@@ -51,5 +58,7 @@ export const config = {
     IAMGE_KIT_PRIVATE_KEY:process.env.IAMGE_KIT_PRIVATE_KEY,
     REDIS_HOST:process.env.REDIS_HOST,
     REDIS_PORT:process.env.REDIS_PORT,
-    REDIS_PASSWORD:process.env.REDIS_PASSWORD
+    REDIS_PASSWORD:process.env.REDIS_PASSWORD,
+    CLIENT_ID:process.env.CLIENT_ID,
+    CLIENT_SECRET:process.env.CLIENT_SECRET
 }

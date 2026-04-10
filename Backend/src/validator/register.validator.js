@@ -31,6 +31,9 @@ export const userValidationRules = [
     .withMessage("Password must contain one uppercase letter")
     .matches(/[0-9]/)
     .withMessage("Password must contain one number"),
+    body("isSeller")
+    .isBoolean()
+    .withMessage("isSeller must be a boolean value"),
     validateRequest
 ];
 

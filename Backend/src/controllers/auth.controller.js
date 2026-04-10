@@ -22,7 +22,7 @@ function generateToken(user) {
     @access Public
 */
 export async function registerController(req, res) {
-    const { email, contact, password, fullName, profilePicture } = req.body
+    const { email, contact, password, fullName, profilePicture,isSeller } = req.body
     try {
         const isUserExist = await userModel.findOne({
             $or: [
@@ -41,7 +41,8 @@ export async function registerController(req, res) {
             contact,
             password,
             fullName,
-            profilePicture
+            profilePicture,
+            role:isSeller?"seller":"buyer"
         })
 
         const verificationToken = crypto.randomBytes(32).toString('hex')
