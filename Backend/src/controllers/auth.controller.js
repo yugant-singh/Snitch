@@ -4,6 +4,7 @@ import { imagekit } from '../utils/imagekit.js'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/config.js'
 import { sendVerificationEmail } from '../utils/sendEmail.js'
+import {redis} from '../config/cache.js'
 import bcrypt from 'bcryptjs'
 function generateToken(user) {
     return jwt.sign({
@@ -280,6 +281,29 @@ export async function updateProfileController(req, res) {
      catch (error) {
         return res.status(500).json({
             message: error.message
+        })
+    }
+}
+
+/*
+@desc logout user
+@route POST /api/auth/logout
+@access Private
+*/
+export async function logoutController(req,res){
+    const token = req.cookies.token
+    try{
+        res.clearCookie("token")
+        await redis.set(token,Date.now().toString())
+
+        return res.status(200).json({  
+            message:"User logged out successfully" 
+        })
+
+    }
+    catch(error){
+        return res.status(500).json({
+            message:"Server Error"
         })
     }
 }

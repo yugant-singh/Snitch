@@ -1,5 +1,7 @@
 import {config} from '../config/config.js'
 import jwt  from 'jsonwebtoken'
+import {redis} from '../config/cache.js'
+
 
 export async function authVerification(req,res,next){
 
@@ -11,7 +13,13 @@ export async function authVerification(req,res,next){
                 message:"Token not provided"
             })
         }
-        console.log("VERIFY SECRET:", config.JWT_SECRET)
+  
+        const isBlacklisted = await redis.get(token)
+        if(isBlacklisted){
+            return res.status(400).json({
+                message:"Token is blacklisted"
+            })
+        }
         let decode = null
      
     try{

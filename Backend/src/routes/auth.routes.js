@@ -5,7 +5,8 @@ import {loginController,
      getMeController, 
      verifyEmailController, 
      resendVerificationEmailController, 
-     updateProfileController} from '../controllers/auth.controller.js'
+     updateProfileController,
+     logoutController} from '../controllers/auth.controller.js'
 import {userValidationRules} from '../validator/register.validator.js'
 import {loginValidationRules} from '../validator/login.validator.js'
 import {authVerification} from '../middleware/auth.middleware.js'
@@ -20,3 +21,5 @@ authRouter.get('/get-me',authVerification,getMeController)
 authRouter.get('/verify-email',verifyEmailController)
 authRouter.post('/resend-verification',resendVerificationEmailController)
 authRouter.put('/update-profile',authVerification,upload.single("profilePicture"),updateProfileController)
+authRouter.get('/logout',authVerification,logoutController)
+
