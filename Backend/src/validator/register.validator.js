@@ -13,11 +13,12 @@ export const userValidationRules = [
   body("email")
     .isEmail()
     .withMessage("Valid email required"),
-
-  body("contact")
-    .matches(/^(?:\+91|91)?[6-9]\d{9}$/)
-    .withMessage("Valid Indian contact number required"),
-
+body("contact")
+  .notEmpty()
+  .withMessage("Contact number is required")
+  .bail()
+  .matches(/^(?:\+91|91)?[6-9]\d{9}$/)
+  .withMessage("Valid Indian contact number required"),
   body("fullName")
     .notEmpty()
     .withMessage("Full name is required")

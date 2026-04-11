@@ -1,4 +1,7 @@
 import { createBrowserRouter } from "react-router-dom"
+import Register from "../features/auth/pages/Register"
+import VerifyNoticePage from "../features/auth/pages/VerifyNoticePage"
+import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage"
 
 export const routes  = createBrowserRouter([
     {
@@ -12,7 +15,14 @@ export const routes  = createBrowserRouter([
     },
     {
         path:'/register',
-        element:<h1>Register Page</h1>
+        element:<Register/>
+    },{
+        path:'/verify',
+        element:<VerifyNoticePage/>
+    },
+    {
+        path:'/verify-email',
+        element:<VerifyEmailPage/>
     }
 
     ]

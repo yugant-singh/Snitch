@@ -1,0 +1,563 @@
+// ─────────────────────────────────────────────────────────────────
+// SNITCH — Register Page  (50/50 Split-Screen, Mood Board Left)
+// ─────────────────────────────────────────────────────────────────
+
+// ── Design tokens ────────────────────────────────────────────────
+$c-bg-page   : #111111;
+$c-bg-right  : #222222;
+$c-off-white : #F5F5F5;
+$c-white     : #ffffff;
+$c-muted     : #666666;
+$c-border    : rgba(85, 77, 77, 0.248);
+$c-border-focus: rgba(245, 245, 245, 0.7);
+
+$f-display   : "Bebas Neue", "Arial Black", sans-serif;
+$f-body      : "Barlow", "Inter", sans-serif;
+
+$ease-out    : cubic-bezier(0.22, 1, 0.36, 1);
+
+// ── Reset (scoped) ───────────────────────────────────────────────
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// ── Root wrapper ─────────────────────────────────────────────────
+.rp-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: $c-bg-page;
+  font-family: $f-body;
+  color: $c-white;
+  overflow: hidden;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEFT — MOOD BOARD
+// ═══════════════════════════════════════════════════════════════
+
+.rp-left {
+  flex: 0 0 50%;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a;
+
+  @media (max-width: 900px) {
+    flex: 0 0 45vh;
+    min-height: 45vh;
+  }
+}
+
+// ── Main Background Image ───────────────────────────────────────
+.editorial-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  .editorial-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.85) contrast(1.1);
+    transform: scale(1.05);
+    transition: transform 12s ease-out;
+
+    .rp-left:hover & {
+      transform: scale(1);
+    }
+  }
+}
+
+// ── Overlay Gradient ──────────────────────────────────────────
+.editorial-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+// ── Inset Editorial Image ──────────────────────────────────────
+.editorial-inset {
+  position: absolute;
+  top: 60px;
+  right: 48px;
+  z-index: 4;
+  width: 140px;
+  height: 180px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .inset-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) contrast(1.2);
+    transition: transform 0.5s $ease-out;
+    
+    .editorial-inset:hover & {
+      transform: scale(1.1);
+    }
+  }
+
+  .inset-meta {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    
+    .inset-label {
+      font-family: $f-body;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: $c-off-white;
+    }
+  }
+
+  @media (max-width: 900px) {
+    top: 30px;
+    right: 24px;
+    width: 100px;
+    height: 130px;
+  }
+}
+
+// ── Content area ──────────────────────────────────────────────
+.editorial-content {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  .brand-subheading {
+    font-family: $f-body;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    color: rgba(245, 245, 245, 0.85);
+    text-transform: uppercase;
+    margin-bottom: -15px;
+    z-index: 2;
+
+    @media (max-width: 900px) {
+      font-size: 9px;
+      letter-spacing: 3px;
+      margin-bottom: -10px;
+    }
+  }
+}
+
+// ── Vertical SNITCH wordmark ──────────────────────────────────
+.brand-wordmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordmark-text {
+  font-family: $f-display;
+  font-size: clamp(80px, 11vw, 150px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: $c-off-white;
+  line-height: 1;
+  text-shadow:
+    0 0 80px rgba(0,0,0,0.9),
+    0 2px 40px rgba(0,0,0,0.7);
+  mix-blend-mode: normal;
+  opacity: 0.95;
+
+  @media (max-width: 900px) {
+    font-size: clamp(56px, 14vw, 100px);
+    letter-spacing: 2px;
+  }
+}
+
+// ── Bottom meta bar ───────────────────────────────────────────
+.left-meta-bar {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+.meta-item {
+  font-family: $f-body;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: rgba(245, 245, 245, 0.4);
+  text-transform: uppercase;
+}
+
+.meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(245, 245, 245, 0.25);
+  flex-shrink: 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RIGHT — FORM
+// ═══════════════════════════════════════════════════════════════
+
+.rp-right {
+  flex: 0 0 50%;
+  background-color: $c-bg-right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+
+  // Subtle grain texture
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 900px) {
+    flex: 1;
+    padding: 40px 24px;
+  }
+}
+
+.form-panel {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1;
+}
+
+// ── Header ───────────────────────────────────────────────────
+.form-eyebrow {
+  font-family: $f-body;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: $c-muted;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.form-heading {
+  font-family: $f-display;
+  font-size: clamp(44px, 6vw, 68px);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 1px;
+  color: $c-off-white;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+// ── Form ─────────────────────────────────────────────────────
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// ── Floating label field group ───────────────────────────────
+.fg {
+  position: relative;
+  padding-top: 18px;
+
+  .fg-label {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    font-family: $f-body;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: $c-muted;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: top 0.22s $ease-out, font-size 0.22s $ease-out, color 0.22s $ease-out;
+  }
+
+  &.fg--active .fg-label {
+    top: 0;
+    font-size: 9px;
+    color: rgba(245, 245, 245, 0.5);
+  }
+
+  .fg-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fg-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid $c-border;
+    padding: 10px 0 8px;
+    font-family: $f-body;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: $c-white;
+    outline: none;
+    -webkit-appearance: none;
+    caret-color: $c-off-white;
+    transition: border-color 0.25s ease;
+
+    &:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px #444040 inset;
+      -webkit-text-fill-color: $c-white;
+    }
+  }
+
+  // Animated focus bar
+  .fg-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: $c-off-white;
+    transition: width 0.35s $ease-out;
+    pointer-events: none;
+  }
+
+  .fg-input:focus ~ .fg-bar,
+  &.fg--active .fg-bar {
+    width: 100%;
+  }
+
+  .fg-input:focus {
+    border-bottom-color: transparent;
+  }
+}
+
+// ── Password toggle ──────────────────────────────────────────
+.pw-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: $c-muted;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+
+  &:hover { color: $c-off-white; }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ── Seller checkbox ──────────────────────────────────────────
+.seller-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__box {
+    width: 18px;
+    height: 18px;
+    border: 1px solid $c-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  &__input:checked + &__box {
+    background: $c-off-white;
+    border-color: $c-off-white;
+
+    svg {
+      display: block;
+    }
+  }
+
+  svg { width: 10px; height: 10px; }
+
+  &__text {
+    font-family: $f-body;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: $c-muted;
+    text-transform: uppercase;
+    user-select: none;
+    transition: color 0.2s ease;
+  }
+
+  &:hover &__box {
+    border-color: rgba(245, 245, 245, 0.45);
+  }
+
+  &:hover &__text {
+    color: rgba(245, 245, 245, 0.7);
+  }
+}
+
+// ── Register button ──────────────────────────────────────────
+.btn-register {
+  width: 100%;
+  padding: 17px 24px;
+  background: $c-off-white;
+  color: #000000;
+  border: 1px solid $c-off-white;
+  font-family: $f-display;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.35s $ease-out;
+
+  // Charcoal sweep — readable, not invisible
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #1a1a1a;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s $ease-out;
+    z-index: 0;
+  }
+
+  // Keep the text above the sweep layer
+  &:hover {
+    color: $c-off-white;
+
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  &:active { transform: scale(0.99); }
+
+  &__text {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ── OR Divider ───────────────────────────────────────────────
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.or-line {
+  flex: 1;
+  height: 1px;
+  background: $c-border;
+}
+
+.or-label {
+  font-family: $f-body;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: $c-muted;
+  text-transform: uppercase;
+}
+
+// ── Google button ─────────────────────────────────────────────
+.btn-google {
+  width: 100%;
+  padding: 14px 24px;
+  background: $c-white;
+  color: #111111;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: $f-body;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+
+  .g-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  &:hover { opacity: 0.9; }
+  &:active { transform: scale(0.99); }
+}
+
+// ── Auth redirect ─────────────────────────────────────────────
+.auth-redirect {
+  margin-top: 28px;
+  font-family: $f-body;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: $c-muted;
+  text-align: right;
+}
+
+.auth-link {
+  color: $c-off-white;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover { opacity: 0.75; }
+}
