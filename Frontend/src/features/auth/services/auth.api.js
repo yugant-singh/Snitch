@@ -21,3 +21,11 @@ export async function verifyEmail(token){
     return response.data
 }
 
+export async function login({email,password}){
+    const response = await apiInstance.post('/login',{
+        email,
+        password
+    })
+    return response.data
+}
+

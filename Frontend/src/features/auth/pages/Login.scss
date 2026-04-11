@@ -1,17 +1,10 @@
 // ─────────────────────────────────────────────────────────────────
-// SNITCH — Register Page  (50/50 Split-Screen, Mood Board Left)
+// SNITCH — Login Page (50/50 Split-Screen, Editorial Left)
 // ─────────────────────────────────────────────────────────────────
 
 @import "../../../styles//variables";
 
-// ── Reset (scoped) ───────────────────────────────────────────────
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-// ── Root wrapper ─────────────────────────────────────────────────
+// ── Root wrapper (Reusing the same structural base) ──────────────
 .rp-wrapper {
   display: flex;
   min-height: 100vh;
@@ -26,7 +19,7 @@
 }
 
 // ═══════════════════════════════════════════════════════════════
-// LEFT — MOOD BOARD
+// LEFT — EDITORIAL
 // ═══════════════════════════════════════════════════════════════
 
 .rp-left {
@@ -224,7 +217,6 @@
   padding: 60px 48px;
   position: relative;
 
-  // Subtle grain texture
   &::before {
     content: "";
     position: absolute;
@@ -371,64 +363,30 @@
   }
 }
 
-// ── Seller checkbox ──────────────────────────────────────────
-.seller-check {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  margin-top: 4px;
-
-  &__input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  &__box {
-    width: 18px;
-    height: 18px;
-    border: 1px solid $c-border;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background: transparent;
-    transition: background 0.2s ease, border-color 0.2s ease;
-  }
-
-  &__input:checked + &__box {
-    background: $c-off-white;
-    border-color: $c-off-white;
-
-    svg {
-      display: block;
-    }
-  }
-
-  svg { width: 10px; height: 10px; }
-
-  &__text {
+// ── Forgot Password Link ─────────────────────────────────────
+.forgot-password {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 4px;
+  
+  a {
     font-family: $f-body;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     color: $c-muted;
-    text-transform: uppercase;
-    user-select: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
     transition: color 0.2s ease;
-  }
 
-  &:hover &__box {
-    border-color: rgba(245, 245, 245, 0.45);
-  }
-
-  &:hover &__text {
-    color: rgba(245, 245, 245, 0.7);
+    &:hover {
+      color: $c-off-white;
+    }
   }
 }
 
-// ── Register button ──────────────────────────────────────────
+// ── Login button ───────────────────────────────────────────
 .btn-register {
   width: 100%;
   padding: 17px 24px;
@@ -446,7 +404,6 @@
   overflow: hidden;
   transition: color 0.35s $ease-out;
 
-  // Charcoal sweep — readable, not invisible
   &::after {
     content: "";
     position: absolute;
@@ -458,7 +415,6 @@
     z-index: 0;
   }
 
-  // Keep the text above the sweep layer
   &:hover {
     color: $c-off-white;
 
