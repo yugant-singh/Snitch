@@ -1,0 +1,100 @@
+@import "../../../styles/variables";
+
+.fg {
+  position: relative;
+  padding-top: 18px;
+
+  &__label {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    font-family: $f-body;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: $c-muted;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: top 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94), font-size 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  &--active &__label {
+    top: 0;
+    font-size: 9px;
+    color: rgba(245, 245, 245, 0.5);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid $c-border;
+    padding: 10px 0 8px;
+    font-family: $f-body;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: $c-white;
+    outline: none;
+    -webkit-appearance: none;
+    caret-color: $c-off-white;
+    transition: border-color 0.25s ease;
+
+    &:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px #444040 inset;
+      -webkit-text-fill-color: $c-white;
+    }
+  }
+
+  // Animated focus bar
+  &__bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: $c-off-white;
+    transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+  }
+
+  &__input:focus ~ &__bar,
+  &--active &__bar {
+    width: 100%;
+  }
+
+  &__input:focus {
+    border-bottom-color: transparent;
+  }
+
+  &__toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: $c-muted;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+
+    &:hover { color: $c-off-white; }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  &__error {
+    color: red;
+    margin-top: 4px;
+    font-size: 12px;
+  }
+}

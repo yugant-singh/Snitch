@@ -3,8 +3,8 @@ import "./Register.scss";
 import { useAuth } from '../hook/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from "react-redux";
-
-
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import FloatingLabelInput from "../components/FloatingLabelInput";
 /* ─── Component ─────────────────────────────────────────────────── */
 const Register = () => {
   const { handleRegister } = useAuth()
@@ -20,6 +20,23 @@ const Register = () => {
 
   const [focused, setFocused] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const handleMouseMove = (e) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    // Calculate values from -1 to 1 based on mouse position
+    const x = (clientX / innerWidth - 0.5) * 2;
+    const y = (clientY / innerHeight - 0.5) * 2;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const xOffset = useTransform(mouseX, [-1, 1], [-15, 15]);
+  const yOffset = useTransform(mouseY, [-1, 1], [-15, 15]);
+  const insetXOffset = useTransform(mouseX, [-1, 1], [15, -15]);
+  const insetYOffset = useTransform(mouseY, [-1, 1], [15, -15]);
 
   /* Two-way binding handler */
   const handleChange = (e) => {
@@ -30,9 +47,21 @@ const Register = () => {
     }));
   };
 
-  const handleFocus = (name) => setFocused((prev) => ({ ...prev, [name]: true }));
-  const handleBlur = (name) =>
-    setFocused((prev) => ({ ...prev, [name]: false }));
+  // Animation variants
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const slideUpItem = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { ease: "easeOut", duration: 0.4 } }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,22 +81,26 @@ const Register = () => {
   };
 
   const handleGoogleAuth = () => {
-    console.log("Google OAuth triggered");
+ window.location.href = "http://localhost:3000/api/auth/google";
   };
 
   return (
-    <div className="rp-wrapper">
+    <div className="rp-wrapper" onMouseMove={handleMouseMove}>
+      <div className="global-texture" />
       {/* ══════════════════ LEFT — EDITORIAL ══════════════════ */}
       <div className="rp-left" aria-hidden="true">
 
         {/* Main Background Image */}
-        <div className="editorial-bg">
+        <motion.div 
+          className="editorial-bg"
+          style={{ x: xOffset, y: yOffset }}
+        >
           <img
-            src="https://images.unsplash.com/photo-1734936870358-913ec30683b6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="https://images.unsplash.com/photo-1674465527571-f8d068b3c516?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Streetwear Look"
             className="editorial-img"
           />
-        </div>
+        </motion.div>
 
         {/* Overlay to ensure text readability */}
         <div className="editorial-overlay" />
@@ -81,16 +114,19 @@ const Register = () => {
         </div>
 
         {/* Inset Image for modern asymmetric editorial look */}
-        <div className="editorial-inset">
+        <motion.div 
+          className="editorial-inset"
+          style={{ x: insetXOffset, y: insetYOffset }}
+        >
           <img
-            src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1674465521712-21c494938666?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Fabric detail"
             className="inset-img"
           />
           <div className="inset-meta">
             <span className="inset-label">DETAIL_01</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Bottom metadata bar */}
         <div className="left-meta-bar">
@@ -104,141 +140,93 @@ const Register = () => {
 
       {/* ══════════════════ RIGHT — FORM ══════════════════ */}
       <div className="rp-right">
-        <div className="form-panel">
+        <motion.div 
+          className="form-panel"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
           {/* Header */}
-          <div className="form-header">
+          <motion.div className="form-header" variants={slideUpItem}>
             <p className="form-eyebrow">NEW MEMBER</p>
             <h1 className="form-heading">
               CREATE  ACCOUNT
             </h1>
-          </div>
+          </motion.div>
 
           {/* Form */}
           <form className="reg-form" onSubmit={handleSubmit} noValidate>
 
-{error?.general && (
-  <p style={{ color: "red", marginBottom: "10px" }}>
-    {error.general}
-  </p>
-)}
+            {error?.general && (
+              <motion.p variants={slideUpItem} style={{ color: "red", marginBottom: "10px" }}>
+                {error.general}
+              </motion.p>
+            )}
+
             {/* Full Name */}
-            <div className={`fg ${focused.fullName || formData.fullName ? "fg--active" : ""}`}>
-              <label htmlFor="fullName" className="fg-label">FULL NAME</label>
-              <input
+            <motion.div variants={slideUpItem}>
+              <FloatingLabelInput
                 id="fullName"
+                label="FULL NAME"
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                onFocus={() => handleFocus("fullName")}
-                onBlur={() => handleBlur("fullName")}
-                className="fg-input"
+                error={error?.fullName}
                 autoComplete="name"
                 required
               />
-
-              {error?.fullName && (
-                <p style={{ color: "red" }}>
-                  {error.fullName}
-                </p>
-              )}
-              <span className="fg-bar" />
-            </div>
+            </motion.div>
 
             {/* Email */}
-            <div className={`fg ${focused.email || formData.email ? "fg--active" : ""}`}>
-              <label htmlFor="email" className="fg-label">EMAIL</label>
-              <input
+            <motion.div variants={slideUpItem}>
+              <FloatingLabelInput
                 id="email"
+                label="EMAIL"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onFocus={() => handleFocus("email")}
-                onBlur={() => handleBlur("email")}
-                className="fg-input"
+                error={error?.email}
                 autoComplete="email"
                 required
               />
-
-              {error?.email && (
-                <p style={{ color: "red" }}>
-                  {error.email}
-                </p>
-              )}
-              <span className="fg-bar" />
-            </div>
+            </motion.div>
 
             {/* Password */}
-            <div className={`fg ${focused.password || formData.password ? "fg--active" : ""}`}>
-              <label htmlFor="password" className="fg-label">PASSWORD</label>
-              <div className="fg-row">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus("password")}
-                  onBlur={() => handleBlur("password")}
-                  className="fg-input"
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="pw-toggle"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M3 3l18 18M10.5 10.677A3 3 0 0013.323 13.5M6.362 6.226C4.496 7.388 3 9.05 3 12c0 3 3.134 7 9 7 1.63 0 3.054-.397 4.27-1.05M9.879 4.243A9.16 9.16 0 0112 5c5.866 0 9 4 9 7 0 1.07-.322 2.108-.944 3.046" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-
-              {error?.password && (
-                <p style={{ color: "red" }}>
-                  {error.password}
-                </p>
-              )}
-              <span className="fg-bar" />
-            </div>
+            <motion.div variants={slideUpItem}>
+              <FloatingLabelInput
+                id="password"
+                label="PASSWORD"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                error={error?.password}
+                autoComplete="new-password"
+                required
+                showPasswordToggle
+              />
+            </motion.div>
 
             {/* Contact Number */}
-            <div className={`fg ${focused.contactNumber || formData.contactNumber ? "fg--active" : ""}`}>
-              <label htmlFor="contact" className="fg-label">CONTACT NUMBER</label>
-              <input
+            <motion.div variants={slideUpItem}>
+              <FloatingLabelInput
                 id="contact"
+                label="CONTACT NUMBER"
                 type="tel"
                 name="contact"
                 value={formData.contact}
                 onChange={handleChange}
-                onFocus={() => handleFocus("contactNumber")}
-                onBlur={() => handleBlur("contactNumber")}
-                className="fg-input"
+                error={error?.contact}
                 autoComplete="tel"
                 maxLength={13}
                 required
               />
-
-              {error?.contact && (
-                <p style={{ color: "red" }}>
-                  {error.contact}
-                </p>
-              )}
-              <span className="fg-bar" />
-            </div>
+            </motion.div>
 
             {/* Seller Checkbox */}
-            <label className="seller-check" htmlFor="isSeller">
+            <motion.label className="seller-check" htmlFor="isSeller" variants={slideUpItem}>
               <input
                 id="isSeller"
                 type="checkbox"
@@ -255,27 +243,28 @@ const Register = () => {
                 )}
               </span>
               <span className="seller-check__text">REGISTER AS A SELLER?</span>
-            </label>
+            </motion.label>
 
             {/* Register CTA */}
-            <button type="submit" className="btn-register" id="btn-register">
+            <motion.button type="submit" className="btn-register" id="btn-register" variants={slideUpItem}>
               <span className="btn-register__text">REGISTER</span>
-            </button>
+            </motion.button>
           </form>
 
           {/* OR divider */}
-          <div className="or-divider">
+          <motion.div className="or-divider" variants={slideUpItem}>
             <span className="or-line" />
             <span className="or-label">OR</span>
             <span className="or-line" />
-          </div>
+          </motion.div>
 
           {/* Google CTA */}
-          <button
+          <motion.button
             type="button"
             className="btn-google"
             id="btn-google"
             onClick={handleGoogleAuth}
+            variants={slideUpItem}
           >
             <svg className="g-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -284,16 +273,16 @@ const Register = () => {
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
             Continue with Google
-          </button>
+          </motion.button>
 
           {/* Login redirect */}
-          <p className="auth-redirect">
+          <motion.p className="auth-redirect" variants={slideUpItem}>
             Already have an account?{" "}
             <a href="/login" className="auth-link" id="link-login">
               Login
             </a>
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );

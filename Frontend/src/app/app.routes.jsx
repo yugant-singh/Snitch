@@ -3,6 +3,7 @@ import Register from "../features/auth/pages/Register"
 import Login from "../features/auth/pages/Login"
 import VerifyNoticePage from "../features/auth/pages/VerifyNoticePage"
 import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage"
+import GoogleSuccessPage from '../features/auth/pages/GoogleSuccessPage'
 
 export const routes  = createBrowserRouter([
     {
@@ -24,6 +25,10 @@ export const routes  = createBrowserRouter([
     {
         path:'/verify-email',
         element:<VerifyEmailPage/>
+    },
+    {
+        path:'/google-success',
+        element:<GoogleSuccessPage/>
     }
 
     ]

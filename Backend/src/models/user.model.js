@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     },
     contact: {
         type: String,
-        required: true
+        required: false
     },
     password: {
         type: String,
@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
     verificationTokenExpiry: {
     type: Date,
     default: null
+},
+googleId: {
+  type: String,
+  default: null
 }
 })
 

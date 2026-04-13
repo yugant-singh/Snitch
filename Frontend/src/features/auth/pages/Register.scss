@@ -19,10 +19,20 @@
   font-family: $f-body;
   color: $c-white;
   overflow: hidden;
+  position: relative;
 
   @media (max-width: 900px) {
     flex-direction: column;
   }
+}
+
+// Global Texture
+.global-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -432,9 +442,9 @@
 .btn-register {
   width: 100%;
   padding: 17px 24px;
-  background: $c-off-white;
+  background: #F5F5F5;
   color: #000000;
-  border: 1px solid $c-off-white;
+  border: 1px solid #F5F5F5;
   font-family: $f-display;
   font-size: 20px;
   font-weight: 400;
@@ -460,7 +470,7 @@
 
   // Keep the text above the sweep layer
   &:hover {
-    color: $c-off-white;
+    color: #F5F5F5;
 
     &::after {
       transform: scaleX(1);
@@ -503,9 +513,9 @@
 .btn-google {
   width: 100%;
   padding: 14px 24px;
-  background: $c-white;
-  color: #111111;
-  border: none;
+  background: transparent;
+  color: $c-off-white;
+  border: 1px solid rgba(245, 245, 245, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,7 +525,7 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 
   .g-icon {
     width: 20px;
@@ -523,7 +533,10 @@
     flex-shrink: 0;
   }
 
-  &:hover { opacity: 0.9; }
+  &:hover { 
+    background: rgba(245, 245, 245, 0.05);
+    border-color: rgba(245, 245, 245, 0.4);
+  }
   &:active { transform: scale(0.99); }
 }
 

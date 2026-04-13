@@ -1,0 +1,137 @@
+@import "../../../styles/variables";
+
+.vn-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #131313;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: $f-body;
+  color: $c-off-white;
+
+  // Background Watermark text "SNITCH"
+  .vn-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: $f-display;
+    font-size: clamp(15rem, 40vw, 40rem);
+    color: #3533335c; // exact dark gray from the image
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    font-weight: 900;
+  }
+
+  // Corner details for the exclusive aesthetic
+  .vn-corner {
+    position: absolute;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.3);
+    z-index: 10;
+    font-family: monospace;
+    text-transform: uppercase;
+    
+    &--tr { top: 2rem; right: 2.5rem; text-align: right; }
+    &--bl { bottom: 2rem; left: 2.5rem; }
+    &--br {
+      bottom: 2rem;
+      right: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg {
+        width: 32px;
+        height: 32px;
+        fill: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+
+  // Central Frosted Card
+  .vn-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 400px;
+    padding: 3rem 2.5rem;
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.4), rgba(20, 20, 20, 0.4));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9);
+
+    .vn-icon-wrapper {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        width: 48px;
+        height: 48px;
+        fill: $c-off-white;
+        filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
+      }
+    }
+
+    .vn-title {
+      font-family: $f-display;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      margin: 0 0 1rem;
+      text-align: center;
+      line-height: 1.2;
+      text-transform: uppercase;
+      color: $c-off-white;
+      font-weight: 700;
+      font-family: "Inter", sans-serif; // Based on screenshot it's closer to standard sans
+    }
+
+    .vn-message {
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0 0 2rem;
+      font-weight: 400;
+      padding: 0 0.5rem;
+      font-family: "Inter", sans-serif;
+    }
+
+    .vn-btn {
+      width: 100%;
+      padding: 1rem 0;
+      background-color: $c-white;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s $ease-out;
+
+      &:hover {
+        background-color: #f0f0f0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}

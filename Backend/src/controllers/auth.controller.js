@@ -4,7 +4,7 @@ import { imagekit } from '../utils/imagekit.js'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/config.js'
 import { sendVerificationEmail } from '../utils/sendEmail.js'
-import {redis} from '../config/cache.js'
+import { redis } from '../config/cache.js'
 import bcrypt from 'bcryptjs'
 function generateToken(user) {
     return jwt.sign({
@@ -22,7 +22,7 @@ function generateToken(user) {
     @access Public
 */
 export async function registerController(req, res) {
-    const { email, contact, password, fullName, profilePicture,isSeller } = req.body
+    const { email, contact, password, fullName, profilePicture, isSeller } = req.body
     try {
         const isUserExist = await userModel.findOne({
             $or: [
@@ -42,7 +42,7 @@ export async function registerController(req, res) {
             password,
             fullName,
             profilePicture,
-            role:isSeller?"seller":"buyer"
+            role: isSeller ? "seller" : "buyer"
         })
 
         const verificationToken = crypto.randomBytes(32).toString('hex')
@@ -83,7 +83,7 @@ export async function loginController(req, res) {
     const { email, password } = req.body
     try {
 
-        const user = await userModel.findOne({email})
+        const user = await userModel.findOne({ email })
         if (!user) {
             return res.status(404).json({
                 message: "User not found "
@@ -258,23 +258,23 @@ export async function updateProfileController(req, res) {
                 fileName: Date.now() + "-" + req.file.originalname,
                 folder: "snitch/profile_pictures"
             })
-               user.profilePicture=uploadImage.url
+            user.profilePicture = uploadImage.url
         }
 
-     
+
         await user.save()
 
         return res.status(200).json({
-            message:"Profile updated successfully",
-            user:{
-                email:user.email,
-                fullName:user.fullName,
-                contact:user.contact,
-                profilePicture:user.profilePicture
+            message: "Profile updated successfully",
+            user: {
+                email: user.email,
+                fullName: user.fullName,
+                contact: user.contact,
+                profilePicture: user.profilePicture
             }
         })
     }
-     catch (error) {
+    catch (error) {
         return res.status(500).json({
             message: error.message
         })
@@ -286,20 +286,74 @@ export async function updateProfileController(req, res) {
 @route POST /api/auth/logout
 @access Private
 */
-export async function logoutController(req,res){
+export async function logoutController(req, res) {
     const token = req.cookies.token
-    try{
+    try {
         res.clearCookie("token")
-        await redis.set(token,Date.now().toString())
+        await redis.set(token, Date.now().toString())
 
-        return res.status(200).json({  
-            message:"User logged out successfully" 
+        return res.status(200).json({
+            message: "User logged out successfully"
         })
 
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({
-            message:"Server Error"
+            message: "Server Error"
+        })
+    }
+}
+
+
+
+
+/*
+@desc google auth callback
+@route POST /api/auth/google/callback
+@access Public
+*/
+
+export async function googleAuthController(req, res) {
+    try {
+        const profile = req.user
+        const email = profile.emails[0].value
+        const fullName = profile.displayName
+        const profilePic = profile.photos[0].value
+        const googleId = profile.id;
+        let user = await userModel.findOne({
+            $or: [
+                { googleId },
+                { email }
+            ]
+        });
+        if (!user) {
+            user = await userModel.create({
+                googleId,
+                email,
+                fullName,
+                profilePicture: profilePic,
+                password: "google-auth",
+                isVerified: true
+            });
+        } else {
+
+            if (!user.googleId) {
+                user.googleId = googleId;
+                await user.save();
+            }
+        }
+
+
+        const token = generateToken(user)
+        res.cookie("token",token)
+        res.redirect(`${config.CLIENT_URL}/google-success?token=${token}`);
+
+
+
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: error.message
         })
     }
 }
