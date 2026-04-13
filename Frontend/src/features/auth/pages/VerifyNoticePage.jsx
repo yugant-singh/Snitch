@@ -1,21 +1,33 @@
 import React from 'react';
 import './VerifyNoticePage.scss';
+import { useLocation } from "react-router-dom";
 
 function VerifyNoticePage() {
-const handleOpenInbox = (e) => {
-  e.preventDefault(); // Browser ki default action ko roko
+  const location = useLocation();
   
-  // Test ke liye hardcoded email use karo
-  const testEmail = "yugantsinh9651@gmail.com"; 
-  const domain = testEmail.split('@')[1];
+  const userEmail = location.state?.email;
+  if (!userEmail) {
+  return <h2>Please register first</h2>;
+}
 
-  console.log("Domain detected:", domain);
+const getEmailProvider = (email) => {
+  if (!email || !email.includes("@")) return null;
 
-  if (domain === 'gmail.com') {
-    window.open('https://mail.google.com', '_blank');
+  const domain = email.split("@")[1];
+
+  if (domain.includes("gmail")) return "https://mail.google.com";
+  if (domain.includes("outlook") || domain.includes("hotmail")) return "https://outlook.live.com";
+  if (domain.includes("yahoo")) return "https://mail.yahoo.com";
+
+  return null;
+};
+const handleOpenInbox = () => {
+  const url = getEmailProvider(userEmail);
+
+  if (url) {
+    window.location.href = url; // 🔥 SAME TAB
   } else {
-    // Agar Gmail nahi hai toh Outlook ya normal mailto
-    window.open('https://outlook.live.com', '_blank');
+    window.location.href = "https://mail.google.com"; // fallback
   }
 };
 
@@ -45,12 +57,13 @@ const handleOpenInbox = (e) => {
         </div>
         <h1 className="vn-title">VERIFICATION SENT</h1>
         <p className="vn-message">
-          We've dispatched a secure link to your inbox. Activate your account to join the circle.
+         We sent a verification link to <b>{userEmail}</b>.Please  activate your account to join the circle.
         </p>
-       <button 
-  type="button" // Sabse important: taaki ye form submit na kare
+ 
+ <button 
+  type="button"
   className="vn-btn" 
-  onClick={(e) => handleOpenInbox(e)}
+  onClick={handleOpenInbox}
 >
   OPEN INBOX
 </button>

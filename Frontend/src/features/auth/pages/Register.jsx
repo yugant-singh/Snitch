@@ -73,7 +73,11 @@ const Register = () => {
         fullName: formData.fullName,
         isSeller: formData.isSeller
       })
-      navigate('/verify')
+      navigate('/verify',
+        { 
+  state: { email: formData.email } 
+}
+      )
     }
     catch (err) {
       console.log(err)
