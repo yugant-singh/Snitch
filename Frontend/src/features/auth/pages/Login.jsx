@@ -95,10 +95,11 @@ const handleGoogleAuth = () => {
         <div className="editorial-overlay" />
 
         <div className="editorial-content">
-          <p className="brand-subheading">WELCOME BACK TO THE CREW.</p>
+       
           <div className="brand-wordmark">
-            <span className="wordmark-text">SNITCH</span>
+            <span className="wordmark-text">HAVOC</span>
           </div>
+             <p className="brand-subheading">PREMIUM CHAOS. TAILORED FOR THE STREET..</p>
         </div>
 
         <motion.div 

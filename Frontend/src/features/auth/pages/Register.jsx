@@ -111,10 +111,11 @@ const Register = () => {
 
         {/* Content Container */}
         <div className="editorial-content">
-          <p className="brand-subheading">UNAPOLOGETICALLY TRENDY. EXCLUSIVELY YOURS.</p>
+       
           <div className="brand-wordmark">
-            <span className="wordmark-text">SNITCH</span>
+            <span className="wordmark-text">HAVOC</span>
           </div>
+             <p className="brand-subheading">PREMIUM CHAOS. TAILORED FOR THE STREET..</p>
         </div>
 
         {/* Inset Image for modern asymmetric editorial look */}
