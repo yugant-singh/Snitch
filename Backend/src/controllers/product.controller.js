@@ -1,0 +1,55 @@
+import prodcutModel from '../models/product.model.js'
+import userModel from '../models/user.model.js'
+import { imagekit } from '../utils/imagekit.js'
+
+
+export async function createProductController(req,res){
+
+    try{
+        const userId = req.user.id
+        const user = await userModel.findById(userId)
+        if(!user){
+            return res.status(400).json({
+                message:"User not found"
+            })
+        }
+
+        if(user.role !== 'seller'){
+            return res.status(400).json({
+                message:"Only sellers can create products"
+            })
+        }
+         const seller = user.role
+        const { title, description, priceAmount, images } = req.body
+        if(req.files){
+            const images = await Promise.all(req.files.map(async (file)=>{
+                const uploadImage = await imagekit.upload({
+                    file:file.buffer,
+                    fileName:Date.now() + "-" + file.originalname,
+                    folder:"snitch/products"    
+                })
+                return uploadImage
+            }))
+            const product = await prodcutModel.create({
+                title,
+                description,
+                price:priceAmount,
+                images: images,
+                seller: userId
+            })
+            return res.status(201).json({
+                message:"Product created successfully",
+                product
+            })  
+        }
+
+       
+
+    }
+    catch(err){
+        return res.status(500).json({
+            message:err.message
+        })}
+
+
+}
