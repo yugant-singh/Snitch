@@ -1,6 +1,6 @@
 import express from 'express'
-import {authVerification} from '../middleware/auth.middleware.js'
-import { createProductController } from '../controllers/product.controller.js'
+import {authenticateSeller} from '../middleware/auth.middleware.js'
+import { createProductController,getSellerProduct } from '../controllers/product.controller.js'
 import { upload } from '../middleware/upload.middleware.js'
 import { createProductValidator } from '../validator/product.validator.js'
 
@@ -8,5 +8,6 @@ import { createProductValidator } from '../validator/product.validator.js'
 
 export const productRouter = express.Router()
 
-productRouter.post('/',authVerification,upload.array('images',7),createProductValidator,createProductController)
+productRouter.post('/',authenticateSeller,upload.array('images',7),createProductValidator,createProductController)
+productRouter.get('/seller',authenticateSeller,getSellerProduct)
 

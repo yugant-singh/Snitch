@@ -6,20 +6,9 @@ import { imagekit } from '../utils/imagekit.js'
 export async function createProductController(req,res){
 
     try{
-        const userId = req.user.id
-        const user = await userModel.findById(userId)
-        if(!user){
-            return res.status(400).json({
-                message:"User not found"
-            })
-        }
-
-        if(user.role !== 'seller'){
-            return res.status(400).json({
-                message:"Only sellers can create products"
-            })
-        }
-         const seller = user.role
+      
+        
+         const seller =req.user
         const { title, description, priceAmount, images } = req.body
         if(req.files){
             const images = await Promise.all(req.files.map(async (file)=>{
@@ -35,7 +24,7 @@ export async function createProductController(req,res){
                 description,
                 price:priceAmount,
                 images: images,
-                seller: userId
+                seller: seller._id
             })
             return res.status(201).json({
                 message:"Product created successfully",
@@ -52,4 +41,20 @@ export async function createProductController(req,res){
         })}
 
 
+}
+export async function getSellerProduct(req,res) {
+    try{
+        const seller = req.user
+
+        const products = await prodcutModel.find({seller:seller._id})
+        return res.status(200).json({
+            message:"Products fetched successfully",
+            products
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            message:err.message
+        })
+    }
 }
