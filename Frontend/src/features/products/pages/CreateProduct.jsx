@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useProducts } from '../hook/useProducts'
+import { useNavigate } from 'react-router-dom'
 import FloatingLabelInput from '../../auth/components/FloatingLabelInput'
 import './CreateProduct.scss'
 
@@ -18,7 +19,8 @@ const CreateProduct = () => {
   const [dragActive, setDragActive] = useState(false)
   const [fileError, setFileError] = useState('')
   const [dropSuccess, setDropSuccess] = useState(false)
-  const [droppedTitle, setDroppedTitle] = useState('')
+  const [droppedData, setDroppedData] = useState(null)
+  const navigate = useNavigate()
 
   const active = Boolean(
     formData.title.trim() ||
@@ -137,7 +139,12 @@ const CreateProduct = () => {
       })
       setImagePreviews([])
       setFileError('')
-      setDroppedTitle(savedTitle)
+      
+      setDroppedData({
+        title: savedTitle,
+        price: formData.priceAmount.trim(),
+        image: imagePreviews[0]
+      })
       setDropSuccess(true)
     } catch (error) {
       console.error('Error creating product:', error)
@@ -300,20 +307,45 @@ const CreateProduct = () => {
         </div>
       </div>
       {/* Success Overlay */}
-      {dropSuccess && (
-        <div className="drop-success" onClick={() => setDropSuccess(false)}>
-          <div className="drop-success__noise" />
-          <div className="drop-success__content">
-            <div className="drop-success__tag">DROP CONFIRMED</div>
-            <h2 className="drop-success__title">{droppedTitle}</h2>
-            <p className="drop-success__sub">YOUR PIECE IS NOW LIVE IN THE ARSENAL.</p>
-            <div className="drop-success__divider" />
-            <p className="drop-success__dismiss">TAP ANYWHERE TO CONTINUE</p>
+      {dropSuccess && droppedData && (
+        <div className="pd-success-modal">
+          <div className="pd-success-modal__noise" />
+          
+          <div className="pd-success-card">
+            <p className="pd-success-card__watermark">AUTHENTICATED_DROP</p>
+            <div className="pd-success-card__header">
+              <span className="eyebrow">DROP_CONFIRMED</span>
+              <div className="divider" />
+            </div>
+            
+            <div className="pd-success-card__visual">
+              <img src={droppedData.image} alt={droppedData.title} />
+            </div>
+            
+            <div className="pd-success-card__meta">
+              <h2 className="title">{droppedData.title}</h2>
+              <span className="price">${droppedData.price}</span>
+            </div>
+            
+            <div className="pd-success-card__footer">
+              <p>YOUR PIECE IS NOW LIVE IN THE ARSENAL.</p>
+            </div>
           </div>
-          <div className="drop-success__corner drop-success__corner--tl">✦</div>
-          <div className="drop-success__corner drop-success__corner--tr">✦</div>
-          <div className="drop-success__corner drop-success__corner--bl">✦</div>
-          <div className="drop-success__corner drop-success__corner--br">✦</div>
+          
+          <div className="pd-success-modal__actions">
+            <button 
+              className="btn-action btn-outline" 
+              onClick={() => setDropSuccess(false)}
+            >
+              [NEW_RELEASE]
+            </button>
+            <button 
+              className="btn-action btn-solid" 
+              onClick={() => navigate('/seller/inventory')}
+            >
+              [GO_TO_ARSENAL]
+            </button>
+          </div>
         </div>
       )}
 

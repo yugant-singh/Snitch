@@ -523,117 +523,185 @@
   z-index: 1;
 }
 
-// ── Drop Success Overlay ────────────────────────────────────────────
-.drop-success {
+// ── Product Identity Card (Success Modal) ─────────────────────────
+.pd-success-modal {
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: #272626;
+  // Gunmetal #303030 with transparency + frosted-glass blur
+  background: rgba(48, 48, 48, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  animation: ds-fadein 0.45s $ease-out both;
+  gap: 2rem;
+  animation: pd-fadein 0.45s $ease-out both;
+
+  &__noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  .pd-success-card {
+    position: relative;
+    z-index: 10;
+    width: 380px;
+    background: #111111; // Dark-on-grey 'lifted' effect
+    border: 1px solid #444; // Subtle technical border
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: pd-slideup 0.55s $ease-out 0.1s both;
+
+    // "AUTHENTICATED_DROP" watermark at the very top
+    &__watermark {
+      text-align: center;
+      font-family: $f-body;
+      font-size: 0.55rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    &__header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+
+      .eyebrow {
+        font-family: $f-body;
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(245, 245, 245, 0.7);
+      }
+
+      .divider {
+        width: 100%;
+        height: 1px;
+        background: #444;
+      }
+    }
+
+    // Image container with internal white-border padding
+    &__visual {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 1px solid #444;
+      background: #0a0a0a;
+      padding: 5px; // Inner padding for the inset-border look
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: grayscale(20%); // Moody 20% desaturation
+        display: block;
+      }
+    }
+
+    &__meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.4rem;
+
+      .title {
+        font-family: $f-display;
+        font-size: 2.5rem;
+        line-height: 1;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 4px; // Architectural spacing
+        margin: 0;
+      }
+
+      .price {
+        font-family: "Courier New", monospace;
+        font-size: 0.95rem; // Slightly smaller than title
+        color: #ffffff; // Bright white
+        letter-spacing: 0.15em;
+      }
+    }
+
+    &__footer {
+      border-top: 1px solid #444;
+      padding-top: 0.85rem;
+      text-align: center;
+
+      p {
+        font-family: $f-body;
+        font-size: 0.6rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(245, 245, 245, 0.4);
+        margin: 0;
+      }
+    }
+  }
+
+  &__actions {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: row; // Side-by-side
+    gap: 1rem;
+    animation: pd-fadein 0.6s $ease-out 0.3s both;
+
+    .btn-action {
+      padding: 0.8rem 1.75rem;
+      font-family: $f-display;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0; // Zero border-radius
+      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+      &.btn-outline {
+        background: transparent;
+        border: 1px solid #ffffff;
+        color: #ffffff;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
+
+      &.btn-solid {
+        background: #ffffff;
+        border: 1px solid #ffffff;
+        color: #000000;
+        font-weight: 700;
+
+        &:hover {
+          background: #e0e0e0;
+          border-color: #e0e0e0;
+        }
+      }
+    }
+  }
 }
 
-@keyframes ds-fadein {
+@keyframes pd-fadein {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-.drop-success__noise {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-}
-
-.drop-success__content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 64px 48px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  max-width: 520px;
-  width: 90%;
-  animation: ds-slidein 0.55s $ease-out 0.1s both;
-}
-
-@keyframes ds-slidein {
-  from { opacity: 0; transform: translateY(28px); }
+@keyframes pd-slideup {
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.drop-success__tag {
-  font-family: $f-body;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
-  margin-bottom: 32px;
-  animation: ds-slidein 0.55s $ease-out 0.2s both;
-}
-
-.drop-success__title {
-  font-family: $f-display;
-  font-size: clamp(42px, 7vw, 80px);
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: $c-off-white;
-  line-height: 0.92;
-  margin: 0 0 28px;
-  animation: ds-slidein 0.55s $ease-out 0.28s both;
-}
-
-.drop-success__sub {
-  font-family: $f-body;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  animation: ds-slidein 0.55s $ease-out 0.36s both;
-}
-
-.drop-success__divider {
-  width: 32px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.18);
-  margin: 32px auto;
-  animation: ds-slidein 0.55s $ease-out 0.42s both;
-}
-
-.drop-success__dismiss {
-  font-family: $f-body;
-  font-size: 9px;
-  letter-spacing: 3.5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.2);
-  animation: ds-blink 2s ease-in-out 0.8s infinite;
-}
-
-@keyframes ds-blink {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 1; }
-}
-
-// Corner ornaments
-.drop-success__corner {
-  position: absolute;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.15);
-  animation: ds-fadein 0.6s $ease-out 0.5s both;
-
-  &--tl { top: 24px; left: 28px; }
-  &--tr { top: 24px; right: 28px; }
-  &--bl { bottom: 24px; left: 28px; }
-  &--br { bottom: 24px; right: 28px; }
-}
 
 @media (max-width: 900px) {
   .rp-product {

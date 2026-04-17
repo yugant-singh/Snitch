@@ -5,6 +5,7 @@ import VerifyNoticePage from "../features/auth/pages/VerifyNoticePage"
 import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage"
 import GoogleSuccessPage from '../features/auth/pages/GoogleSuccessPage'
 import CreateProduct from '../features/products/pages/CreateProduct'
+import SellerInventory from "../features/products/pages/SellerInventory"
 
 export const routes  = createBrowserRouter([
     {
@@ -34,6 +35,10 @@ export const routes  = createBrowserRouter([
     {
         path:'/create-product',
         element:<CreateProduct/>
+    },
+    {
+        path:'/seller/inventory',
+        element:<SellerInventory/>
     }
 
     ]
