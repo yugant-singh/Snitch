@@ -7,13 +7,20 @@ import GoogleSuccessPage from '../features/auth/pages/GoogleSuccessPage'
 import CreateProduct from '../features/products/pages/CreateProduct'
 import Dashboard from "../features/products/pages/Dashboard"
 import Protected from "../features/auth/components/Protected"
+import Home from '../features/products/pages/Home'
+import ProductDetail from "../features/products/pages/ProductDetail"
 
 export const routes = createBrowserRouter([
     {
 
         path: '/',
-        element: <h1>Home Page</h1>
+        element:<Home/>
     },
+    {
+        path:'/product/:productId',
+        element:<ProductDetail/>
+    },
+
     {
         path: '/login',
         element: <Login />

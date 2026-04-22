@@ -1,0 +1,96 @@
+@import "../../../styles/variables";
+
+.card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border: 1px solid transparent; // Hidden by default
+  transition: border-color 0.4s $ease-out;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2); // Thin border on hover
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4; // Classic lookbook ratio
+  background-color: #222;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  transition: filter 0.8s $ease-out;
+}
+
+// Hover effect on the card targets the image
+.card:hover .image {
+  filter: grayscale(0%);
+}
+
+/* Price Pill Overlay */
+.pricePill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: $c-white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scan-line Hover Overlay */
+.scanlineOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 3px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  opacity: 0;
+  transition: opacity 0.4s $ease-out;
+  pointer-events: none; // Let clicks pass through to the wrapper
+  z-index: 4;
+}
+
+.card:hover .scanlineOverlay {
+  opacity: 1;
+}
+
+/* Typography below image */
+.meta {
+  padding: 16px 8px; // Slight horizontal padding to align with the border
+  display: flex;
+  justify-content: center;
+}
+
+.title {
+  color: $c-white;
+  font-family: $f-display;
+  font-size: 1.1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.15em; // Wide-spaced minimal font
+  color: #ccc;
+  transition: color 0.3s ease;
+}
+
+.card:hover .title {
+  color: $c-white;
+}
