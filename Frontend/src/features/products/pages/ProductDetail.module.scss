@@ -1,0 +1,504 @@
+@import "../../../styles/variables";
+
+// ─── Page Shell ───────────────────────────────────────────────────────────────
+.pageContainer {
+  height: 100vh;
+  overflow: hidden;
+  background-color: #303030;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+  background-size: 50px 50px;
+  color: $c-white;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Ticker Tape ──────────────────────────────────────────────────────────────
+.tickerContainer {
+  width: 100%;
+  background: #252525;
+  border-bottom: 1px solid #111;
+  overflow: hidden;
+  padding: 6px 0;
+  display: flex;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tickerText {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: $c-white;
+  display: inline-block;
+  padding-left: 100%;
+  animation: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+
+// ─── Top Navigation Bar ───────────────────────────────────────────────────────
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 60px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    padding: 16px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.backBtn {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: $c-white;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    color: $c-white;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.breadcrumb {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: #555;
+
+  @media (max-width: 768px) {
+    font-size: 0.58rem;
+  }
+}
+
+// ─── Two-Column Content Grid ──────────────────────────────────────────────────
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px;
+  gap: 80px;
+  align-items: start;
+  overflow: hidden;
+
+  @media (max-width: 1200px) {
+    gap: 50px;
+    padding: 40px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 32px 24px;
+    overflow: visible;
+  }
+}
+
+// ─── Gallery Column ───────────────────────────────────────────────────────────
+.galleryCol {
+  display: flex;
+  gap: 16px;
+  position: sticky;
+  top: 20px;
+
+  @media (max-width: 900px) {
+    position: static;
+    flex-direction: column-reverse;
+  }
+}
+
+// Thumbnail strip (vertical)
+.thumbStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+
+  @media (max-width: 900px) {
+    flex-direction: row;
+  }
+}
+
+.thumb {
+  width: 70px;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  filter: grayscale(100%);
+  opacity: 0.5;
+  transition: opacity 0.3s ease, filter 0.3s ease, border-color 0.3s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &:hover {
+    opacity: 0.8;
+    filter: grayscale(50%);
+  }
+
+  @media (max-width: 900px) {
+    width: 60px;
+  }
+}
+
+.thumbActive {
+  filter: grayscale(0%);
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+// Main image
+.mainImageWrapper {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  background-color: #1a1a1a;
+  overflow: hidden;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s $ease-out;
+}
+
+.mainImageVisible {
+  opacity: 1;
+}
+
+// Scanline overlay
+.scanlineOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+// Corner bracket markers
+.corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cornerTL { top: 10px;    left: 10px;    border-top: 1px solid rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.5); }
+.cornerTR { top: 10px;    right: 10px;   border-top: 1px solid rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.5); }
+.cornerBL { bottom: 10px; left: 10px;    border-bottom: 1px solid rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.5); }
+.cornerBR { bottom: 10px; right: 10px;   border-bottom: 1px solid rgba(255,255,255,0.5); border-right: 1px solid rgba(255,255,255,0.5); }
+
+// Image counter
+.imageIndex {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+  z-index: 4;
+}
+
+// ─── Info Column ──────────────────────────────────────────────────────────────
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-top: 8px;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 20px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+}
+
+.systemTag {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  color: $c-white;
+  margin-bottom: 20px;
+}
+
+.productTitle {
+  font-family: $f-display;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
+  margin: 0 0 28px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 24px 0;
+}
+
+// Price
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.priceLabel {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  color: $c-white;
+}
+
+.priceValue {
+  font-family: $f-display;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: $c-white;
+  line-height: 1;
+}
+
+.currency {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: $c-white;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+// Description
+.descSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionLabel {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  color: $c-white;
+}
+
+.description {
+  font-family: $f-body;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #aaa;
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+}
+
+// Meta table
+.metaTable {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metaKey {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: $c-white;
+}
+
+.metaVal {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: #aaa;
+}
+
+.statusActive {
+  color: #6dff6d;
+  letter-spacing: 0.2em;
+}
+
+// CTA Buttons
+.ctaGroup {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  flex: 1;
+  min-width: 160px;
+  padding: 18px 24px;
+  background: $c-white;
+  color: #111;
+  border: none;
+  font-family: $f-display;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s $ease-out;
+
+  &:hover {
+    background: #ddd;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btnSecondary {
+  flex: 0 0 auto;
+  padding: 18px 24px;
+  background: transparent;
+  color: $c-white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-family: $f-display;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: border-color 0.3s ease, color 0.3s ease, transform 0.2s $ease-out;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.footerTag {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: #444;
+  margin-top: 32px;
+}
+
+// ─── Loading State ────────────────────────────────────────────────────────────
+.loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: #303030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pulseContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.pulseText {
+  font-family: $f-display;
+  font-size: 1.8rem;
+  letter-spacing: 0.5em;
+  color: $c-white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.98); }
+  50%       { opacity: 1;   transform: scale(1); }
+}
+
+.progressBar {
+  width: 240px;
+  height: 1px;
+  background: #111;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressFill {
+  width: 100%;
+  height: 100%;
+  background: $c-white;
+  animation: loading 2s cubic-bezier(0.85, 0, 0.15, 1) infinite;
+}
+
+@keyframes loading {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+// ─── Not Found ────────────────────────────────────────────────────────────────
+.notFound {
+  min-height: 100vh;
+  background: #303030;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.notFoundText {
+  font-family: $f-display;
+  font-size: clamp(2rem, 6vw, 5rem);
+  letter-spacing: 0.3em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  margin: 0;
+}
