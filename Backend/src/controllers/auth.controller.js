@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs'
 function generateToken(user) {
     return jwt.sign({
         id: user._id,
+        role: user.role 
     },
         config.JWT_SECRET,
         {
@@ -60,7 +61,8 @@ export async function registerController(req, res) {
                 id: user._id,
                 contact: user.contact,
                 email: user.email,
-                fullName: user.fullName
+                fullName: user.fullName,
+                role:user.role
 
             },
 
@@ -112,7 +114,8 @@ export async function loginController(req, res) {
                 id: user._id,
                 email: user.email,
                 fullName: user.fullName,
-                contact: user.contact
+                contact: user.contact,
+                role:user.role
             }, token
         })
 
@@ -143,7 +146,8 @@ export async function getMeController(req, res) {
                 email: user.email,
                 contact: user.contact,
                 fullName: user.fullName,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                role:user.role
             }
         })
     }

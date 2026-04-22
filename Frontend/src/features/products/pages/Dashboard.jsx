@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useProducts } from '../hook/useProducts'
 import './SellerInventory.scss'
 
-const SellerInventory = () => {
+const Dashboard = () => {
   const { handleSellerProducts } = useProducts()
   const sellerProducts = useSelector((state) => state.product.sellerProducts)
   const [loading, setLoading] = useState(true)
@@ -35,7 +35,7 @@ const SellerInventory = () => {
         
         <button 
           className="btn-new-drop"
-          onClick={() => navigate('/create-product')}
+          onClick={() => navigate('/seller/create-product')}
         >
           NEW DROP
         </button>
@@ -80,7 +80,7 @@ const SellerInventory = () => {
             <p>THE ARSENAL IS EMPTY. DEPLOY YOUR FIRST DROP.</p>
             <button 
               className="btn-deploy"
-              onClick={() => navigate('/create-product')}
+              onClick={() => navigate('/seller/create-product')}
             >
               DEPLOY FIRST DROP
             </button>
@@ -91,4 +91,4 @@ const SellerInventory = () => {
   )
 }
 
-export default SellerInventory
+export default Dashboard

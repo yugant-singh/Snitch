@@ -341,7 +341,7 @@ const CreateProduct = () => {
             </button>
             <button 
               className="btn-action btn-solid" 
-              onClick={() => navigate('/seller/inventory')}
+              onClick={() => navigate('/seller/dashboard')}
             >
               [GO_TO_ARSENAL]
             </button>

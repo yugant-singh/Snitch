@@ -29,3 +29,10 @@ export async function login({email,password}){
     return response.data
 }
 
+export async function getMe(){
+    const response = await apiInstance.get('/get-me')
+    return response.data
+}
+
+
+

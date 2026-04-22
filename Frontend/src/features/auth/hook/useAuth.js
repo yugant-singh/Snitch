@@ -1,5 +1,5 @@
 import { setUser, setError, setLoading } from '../state/auth.slice'
-import { register, verifyEmail, login } from '../services/auth.api'
+import { register, verifyEmail, login, getMe } from '../services/auth.api'
 import { useDispatch } from 'react-redux'
 
 
@@ -11,27 +11,28 @@ export const useAuth = () => {
             dispatch(setLoading(true))
             const data = await register({ email, contact, password, fullName, isSeller })
             dispatch(setUser(data.user))
+            return data.user
         }
-       catch (err) {
-    const errors = err.response?.data?.errors
+        catch (err) {
+            const errors = err.response?.data?.errors
 
-    if (errors) {
-        const formattedErrors = {}
+            if (errors) {
+                const formattedErrors = {}
 
-        errors.forEach(e => {
-            formattedErrors[e.path] = e.msg
-        })
+                errors.forEach(e => {
+                    formattedErrors[e.path] = e.msg
+                })
 
-        dispatch(setError(formattedErrors))
-    } else {
-        // 🔥 YE ADD KARO (important)
-        dispatch(setError({
-            general: err.response?.data?.message
-        }))
-    }
+                dispatch(setError(formattedErrors))
+            } else {
+                // 🔥 YE ADD KARO (important)
+                dispatch(setError({
+                    general: err.response?.data?.message
+                }))
+            }
 
-    throw err
-}
+            throw err
+        }
 
         finally {
             dispatch(setLoading(false))
@@ -44,6 +45,7 @@ export const useAuth = () => {
             dispatch(setLoading(true))
             const data = await verifyEmail(token)
             return data
+
         }
         catch (err) {
             dispatch(setError(err.response?.data?.message))
@@ -58,34 +60,49 @@ export const useAuth = () => {
             dispatch(setLoading(true))
             const data = await login({ email, password })
             dispatch(setUser(data.user))
+            return data.user
         }
-       catch (err) {
-    const errors = err.response?.data?.errors
+        catch (err) {
+            const errors = err.response?.data?.errors
 
-    if (errors) {
-        const formattedErrors = {}
+            if (errors) {
+                const formattedErrors = {}
 
-        errors.forEach(e => {
-            formattedErrors[e.path] = e.msg
-        })
+                errors.forEach(e => {
+                    formattedErrors[e.path] = e.msg
+                })
 
-        dispatch(setError(formattedErrors))
-    } else {
-        // 🔥 YE ADD KARO (important)
-        dispatch(setError({
-            general: err.response?.data?.message
-        }))
-    }
+                dispatch(setError(formattedErrors))
+            } else {
+                // 🔥 YE ADD KARO (important)
+                dispatch(setError({
+                    general: err.response?.data?.message
+                }))
+            }
 
-    throw err
-}
+            throw err
+        }
         finally {
             dispatch(setLoading(false))
         }
 
     }
 
-    return { handleRegister, handleVerifyEmail, handleLogin }
+    async function handleGetMe() {
+        try {
+            dispatch(setLoading(true))
+            const data = await getMe()
+            dispatch(setUser(data.user))
+        }
+        catch (err) {
+
+            console.log(err)
+        }
+        finally {
+            dispatch(setLoading(false))
+        }
+    }
+    return { handleRegister, handleVerifyEmail, handleLogin, handleGetMe }
 
 
 }

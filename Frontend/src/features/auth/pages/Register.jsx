@@ -100,7 +100,7 @@ const Register = () => {
           style={{ x: xOffset, y: yOffset }}
         >
           <img
-            src="https://images.unsplash.com/photo-1674465527571-f8d068b3c516?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="public/images/login img.avif"
             alt="Streetwear Look"
             className="editorial-img"
           />
@@ -124,7 +124,7 @@ const Register = () => {
           style={{ x: insetXOffset, y: insetYOffset }}
         >
           <img
-            src="https://images.unsplash.com/photo-1674465521712-21c494938666?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="public/images/small login img.avif"
             alt="Fabric detail"
             className="inset-img"
           />
