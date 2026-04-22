@@ -19,7 +19,7 @@ export async function createProductController(req,res){
                 })
                 return uploadImage
             }))
-            const product = await prodcutModel.create({
+            const product = await productModel.create({
                 title,
                 description,
                 price:priceAmount,
@@ -46,7 +46,7 @@ export async function getSellerProduct(req,res) {
     try{
         const seller = req.user
 
-        const products = await prodcutModel.find({seller:seller._id})
+        const products = await productModel.find({seller:seller._id})
         return res.status(200).json({
             message:"Products fetched successfully",
             products
