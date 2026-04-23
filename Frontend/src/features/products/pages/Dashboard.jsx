@@ -48,7 +48,11 @@ const Dashboard = () => {
           </div>
         ) : sellerProducts && sellerProducts.length > 0 ? (
           sellerProducts.map((product) => (
-            <div key={product._id} className="arsenal-card">
+            <div key={product._id} className="arsenal-card"
+            onClick={()=>{
+              navigate(`/seller/product/${product._id}`)
+            }}
+            >
               <div className="arsenal-card__img-container">
                 {product.images && product.images.length > 0 ? (
                   <img 
