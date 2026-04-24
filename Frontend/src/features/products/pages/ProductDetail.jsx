@@ -23,11 +23,13 @@ const VariantSelector = ({ variants, selectedVariantId, onSelect }) => {
     variants.flatMap(v => Object.keys(attrsToObj(v.attributes || {})))
   )];
 
-  // If no attributes at all — show simple variant buttons
+  // If no attributes at all — try to fall back to a generic variant picker if they exist
   if (allKeys.length === 0) {
     return (
       <div className={styles.variantSection}>
-        <span className={styles.sectionLabel}>// SELECT_VARIANT</span>
+        <div className={styles.attrLabelRow}>
+          <span className={styles.sectionLabel}>SELECT_VARIANT //</span>
+        </div>
         <div className={styles.variantGrid}>
           {variants.map((v, i) => (
             <button
@@ -35,7 +37,7 @@ const VariantSelector = ({ variants, selectedVariantId, onSelect }) => {
               className={`${styles.variantBtn} ${selectedVariantId === v._id ? styles.variantBtnActive : ''}`}
               onClick={() => onSelect(v._id)}
             >
-              VARIANT_{String(i + 1).padStart(2, '0')}
+              V_{String(i + 1).padStart(2, '0')}
             </button>
           ))}
         </div>
@@ -89,7 +91,7 @@ const VariantSelector = ({ variants, selectedVariantId, onSelect }) => {
         return (
           <div key={key} className={styles.attrGroup}>
             <div className={styles.attrLabelRow}>
-              <span className={styles.sectionLabel}>// {key.toUpperCase()}</span>
+              <span className={styles.sectionLabel}>SELECT_{key.toUpperCase()} //</span>
               {selectedVal && (
                 <span className={styles.attrSelectedVal}>{selectedVal.toUpperCase()}</span>
               )}

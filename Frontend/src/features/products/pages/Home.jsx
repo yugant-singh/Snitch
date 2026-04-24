@@ -59,7 +59,7 @@ const Home = () => {
         {/* Main Gallery */}
         <main className={styles.galleryMain}>
           <header className={styles.header}>
-            <h1 className={styles.mainTitle}>COLLECTION_01</h1>
+            <h1 className={styles.mainTitle}>THE_MAIN_DECK</h1>
           </header>
 
           {products && products.length > 0 ? (

@@ -327,9 +327,9 @@
   font-family: "Courier New", Courier, monospace;
   font-size: 0.85rem;
   letter-spacing: 0.1em;
-  color: #aaa;
+  color: #fff;
   background: transparent;
-  border: 1px solid #666;
+  border: 1px solid #444;
   width: 45px;
   height: 45px;
   display: flex;
@@ -362,9 +362,10 @@
 
 .sectionLabel {
   font-family: "Courier New", Courier, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.25em;
-  color: $c-white;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: #888;
+  text-transform: uppercase;
 }
 
 .description {
@@ -413,7 +414,7 @@
 .ctaGroup {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 15px;
   margin-top: 8px;
   width: 100%;
 }
@@ -421,6 +422,7 @@
 .btnPrimary {
   flex: 1;
   padding: 20px 0;
+  height: auto;
   background: $c-white;
   color: #111;
   border: 1px solid $c-white;
@@ -445,6 +447,7 @@
 .btnSecondary {
   flex: 1;
   padding: 20px 0;
+  height: auto;
   background: transparent;
   color: $c-white;
   border: 1px solid $c-white;
@@ -597,7 +600,7 @@
 .colorSwatch {
   width: 36px;
   height: 36px;
-  border-radius: 50% !important; // override global border-radius: 0
+  border-radius: 0px !important; // override global border-radius: 0 if needed, but keeping it 0 for tactical theme
   border: 2px solid rgba(255, 255, 255, 0.2);
   background-color: var(--swatch-color, #888);
   cursor: pointer;
