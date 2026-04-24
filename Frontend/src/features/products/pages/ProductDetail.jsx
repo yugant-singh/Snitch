@@ -4,6 +4,136 @@ import { useSelector } from 'react-redux';
 import { useProducts } from '../hook/useProducts';
 import styles from './ProductDetail.module.scss';
 
+// ── Helper: Mongoose Map → plain object ──────────────────────────
+function attrsToObj(attributes) {
+  if (!attributes) return {};
+  if (attributes instanceof Map) return Object.fromEntries(attributes);
+  // Mongoose returns Map-like object with entries() — handle both
+  if (typeof attributes.entries === 'function') return Object.fromEntries(attributes.entries());
+  return attributes;
+}
+
+// ── VariantSelector: Amazon-style grouped attribute pickers ──────
+const VariantSelector = ({ variants, selectedVariantId, onSelect }) => {
+  const selectedVariant = variants.find(v => v._id === selectedVariantId);
+  const selectedAttrs = attrsToObj(selectedVariant?.attributes || {});
+
+  // Collect all unique attribute keys across all variants
+  const allKeys = [...new Set(
+    variants.flatMap(v => Object.keys(attrsToObj(v.attributes || {})))
+  )];
+
+  // If no attributes at all — show simple variant buttons
+  if (allKeys.length === 0) {
+    return (
+      <div className={styles.variantSection}>
+        <span className={styles.sectionLabel}>// SELECT_VARIANT</span>
+        <div className={styles.variantGrid}>
+          {variants.map((v, i) => (
+            <button
+              key={v._id}
+              className={`${styles.variantBtn} ${selectedVariantId === v._id ? styles.variantBtnActive : ''}`}
+              onClick={() => onSelect(v._id)}
+            >
+              VARIANT_{String(i + 1).padStart(2, '0')}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Handle attribute key selection — pick best matching variant
+  const handleAttrSelect = (key, value) => {
+    // Try to find a variant that matches ALL currently selected attrs + this new one
+    const newAttrs = { ...selectedAttrs, [key]: value };
+    const match = variants.find(v => {
+      const obj = attrsToObj(v.attributes || {});
+      return Object.entries(newAttrs).every(([k, val]) => obj[k] === val);
+    });
+    if (match) {
+      onSelect(match._id);
+    } else {
+      // Partial match — find variant with at least this key=value
+      const partial = variants.find(v => {
+        const obj = attrsToObj(v.attributes || {});
+        return obj[key] === value;
+      });
+      if (partial) onSelect(partial._id);
+    }
+  };
+
+  // Get unique values for each attribute key
+  const getValuesForKey = (key) => {
+    const vals = variants.map(v => attrsToObj(v.attributes || {})[key]).filter(Boolean);
+    return [...new Set(vals)];
+  };
+
+  // Check if a value is available (has stock > 0) for a given key
+  const isAvailable = (key, value) => {
+    return variants.some(v => {
+      const obj = attrsToObj(v.attributes || {});
+      return obj[key] === value && (v.stock === undefined || v.stock > 0);
+    });
+  };
+
+  const isColorKey = (key) => key.toLowerCase().includes('color') || key.toLowerCase().includes('colour');
+
+  return (
+    <div className={styles.variantSection}>
+      {allKeys.map(key => {
+        const values = getValuesForKey(key);
+        const selectedVal = selectedAttrs[key];
+        const isColor = isColorKey(key);
+
+        return (
+          <div key={key} className={styles.attrGroup}>
+            <div className={styles.attrLabelRow}>
+              <span className={styles.sectionLabel}>// {key.toUpperCase()}</span>
+              {selectedVal && (
+                <span className={styles.attrSelectedVal}>{selectedVal.toUpperCase()}</span>
+              )}
+            </div>
+
+            <div className={styles.variantGrid}>
+              {values.map(val => {
+                const isSelected = selectedVal === val;
+                const available = isAvailable(key, val);
+
+                if (isColor) {
+                  return (
+                    <button
+                      key={val}
+                      title={val}
+                      disabled={!available}
+                      onClick={() => handleAttrSelect(key, val)}
+                      className={`${styles.colorSwatch} ${isSelected ? styles.colorSwatchActive : ''} ${!available ? styles.swatchUnavailable : ''}`}
+                      style={{ '--swatch-color': val }}
+                    />
+                  );
+                }
+
+                return (
+                  <button
+                    key={val}
+                    disabled={!available}
+                    onClick={() => handleAttrSelect(key, val)}
+                    className={`${styles.variantBtn} ${isSelected ? styles.variantBtnActive : ''} ${!available ? styles.variantBtnUnavailable : ''}`}
+                  >
+                    {val.toUpperCase()}
+                    {!available && <span className={styles.outOfStock}> // OUT</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ── Main Component ───────────────────────────────────────────────
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -13,6 +143,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -27,17 +158,26 @@ const ProductDetail = () => {
     fetch();
   }, [productId]);
 
-  // Reset image state when product changes
   useEffect(() => {
     setActiveImg(0);
     setImgLoaded(false);
+    if (product?.varient?.length > 0) {
+      setSelectedVariantId(product.varient[0]._id);
+    } else {
+      setSelectedVariantId(null);
+    }
   }, [product?._id]);
+
+  useEffect(() => {
+    setActiveImg(0);
+    setImgLoaded(false);
+  }, [selectedVariantId]);
 
   if (loading) {
     return (
       <div className={styles.loadingOverlay}>
         <div className={styles.pulseContainer}>
-          <span className={styles.pulseText}>LOADING_ASSET...</span>
+          <span className={styles.pulseText}>INITIALIZING_SYSTEM...</span>
           <div className={styles.progressBar}>
             <div className={styles.progressFill} />
           </div>
@@ -57,7 +197,10 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product.images || [];
+  const selectedVariant = product.varient?.find(v => v._id === selectedVariantId) || null;
+  const images = (selectedVariant?.images?.length > 0) ? selectedVariant.images : (product.images || []);
+  const displayPrice = selectedVariant?.price || product.price || 0;
+  const displayStock = selectedVariant?.stock !== undefined ? selectedVariant.stock : product.stock;
   const mainImageUrl = images.length > 0 ? images[activeImg]?.url : '/placeholder-image.jpg';
 
   return (
@@ -70,11 +213,9 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Back */}
+      {/* Top Bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate('/')}>
-          ← BACK_TO_GALLERY
-        </button>
+        <button className={styles.backBtn} onClick={() => navigate('/')}>← BACK_TO_GALLERY</button>
         <span className={styles.breadcrumb}>HAVOC // COLLECTION_01 // {product.title.toUpperCase()}</span>
       </div>
 
@@ -83,13 +224,11 @@ const ProductDetail = () => {
 
         {/* LEFT — Image Gallery */}
         <div className={styles.galleryCol}>
-
-          {/* Thumbnails */}
           {images.length > 1 && (
             <div className={styles.thumbStrip}>
               {images.map((img, i) => (
                 <div
-                  key={img._id}
+                  key={img._id || i}
                   className={`${styles.thumb} ${i === activeImg ? styles.thumbActive : ''}`}
                   onClick={() => { setActiveImg(i); setImgLoaded(false); }}
                 >
@@ -99,7 +238,6 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {/* Main Image */}
           <div className={styles.mainImageWrapper}>
             <img
               key={mainImageUrl}
@@ -108,14 +246,11 @@ const ProductDetail = () => {
               className={`${styles.mainImage} ${imgLoaded ? styles.mainImageVisible : ''}`}
               onLoad={() => setImgLoaded(true)}
             />
-            {/* Scanline overlay */}
             <div className={styles.scanlineOverlay} />
-            {/* Corner markers */}
             <span className={`${styles.corner} ${styles.cornerTL}`} />
             <span className={`${styles.corner} ${styles.cornerTR}`} />
             <span className={`${styles.corner} ${styles.cornerBL}`} />
             <span className={`${styles.corner} ${styles.cornerBR}`} />
-            {/* Image index */}
             <div className={styles.imageIndex}>
               {String(activeImg + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
             </div>
@@ -124,22 +259,31 @@ const ProductDetail = () => {
 
         {/* RIGHT — Product Info */}
         <div className={styles.infoCol}>
-
           <div className={styles.systemTag}>SYSTEM_ID: {product._id.slice(-8).toUpperCase()}</div>
-
           <h1 className={styles.productTitle}>{product.title}</h1>
-
           <div className={styles.divider} />
 
           <div className={styles.priceRow}>
             <span className={styles.priceLabel}>PRICE</span>
             <span className={styles.priceValue}>
-              ₹{product.price.toLocaleString('en-IN')}
-              <span className={styles.currency}>{product.currency}</span>
+              ₹{displayPrice.toLocaleString('en-IN')}
+              <span className={styles.currency}>{selectedVariant?.currency || product.currency}</span>
             </span>
           </div>
 
           <div className={styles.divider} />
+
+          {/* Amazon-style Variant Selector */}
+          {product.varient && product.varient.length > 0 && (
+            <>
+              <VariantSelector
+                variants={product.varient}
+                selectedVariantId={selectedVariantId}
+                onSelect={setSelectedVariantId}
+              />
+              <div className={styles.divider} />
+            </>
+          )}
 
           <div className={styles.descSection}>
             <span className={styles.sectionLabel}>// DESCRIPTION</span>
@@ -148,7 +292,6 @@ const ProductDetail = () => {
 
           <div className={styles.divider} />
 
-          {/* Metadata table */}
           <div className={styles.metaTable}>
             <div className={styles.metaRow}>
               <span className={styles.metaKey}>SELLER_ID</span>
@@ -166,14 +309,29 @@ const ProductDetail = () => {
               <span className={styles.metaKey}>STATUS</span>
               <span className={`${styles.metaVal} ${styles.statusActive}`}>● ACTIVE</span>
             </div>
+            <div className={styles.metaRow}>
+              <span className={styles.metaKey}>STOCK_LEVEL</span>
+              <span className={`${styles.metaVal} ${displayStock === 0 ? styles.stockOut : displayStock < 5 ? styles.stockLow : ''}`}>
+                {displayStock !== undefined ? `${displayStock} UNITS` : 'UNKNOWN'}
+              </span>
+            </div>
           </div>
 
           <div className={styles.divider} />
 
-          {/* CTA */}
           <div className={styles.ctaGroup}>
-            <button className={styles.btnPrimary}>ADD_TO_CART</button>
-            <button className={styles.btnSecondary}>Buy Now</button>
+            <button
+              className={styles.btnPrimary}
+              disabled={displayStock === 0}
+            >
+              {displayStock === 0 ? 'OUT_OF_STOCK' : 'ADD_TO_CART'}
+            </button>
+            <button
+              className={styles.btnSecondary}
+              disabled={displayStock === 0}
+            >
+              BUY_NOW
+            </button>
           </div>
 
           <div className={styles.footerTag}>HAVOC_SYSTEMS_v1.0 // ALL_RIGHTS_RESERVED</div>

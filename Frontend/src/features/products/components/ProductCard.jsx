@@ -17,11 +17,13 @@ const ProductCard = ({ product }) => {
     <div className={styles.card} onClick={handleNavigate}>
       <div className={styles.imageWrapper}>
         <img src={mainImage} alt={title} className={styles.image} />
-        
         {/* Price Pill Overlay */}
         <div className={styles.pricePill}>
           ₹{price}
         </div>
+
+        <div className={styles.availableTag}>AVAILABLE //</div>
+        <div className={styles.viewOverlay}>VIEW ↗</div>
 
         {/* Scan-line Hover Effect Overlay */}
         <div className={styles.scanlineOverlay}></div>

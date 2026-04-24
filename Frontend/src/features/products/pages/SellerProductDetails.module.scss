@@ -730,3 +730,83 @@ $font-body: 'Barlow', 'Arial', sans-serif;
         opacity: 0.9;
     }
 }
+// ─── Dynamic Attribute Rows ──────────────────────────────────
+.attributeRows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.attributeRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .modalInput {
+        flex: 1;
+    }
+}
+
+.attrRemoveBtn {
+    background: transparent;
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    color: #ff3b30;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+
+    &:hover {
+        background: rgba(255, 59, 48, 0.15);
+    }
+}
+
+.attrAddBtn {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px dashed #444;
+    color: #888;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.2s, border-color 0.2s;
+
+    &:hover {
+        color: #ffffff;
+        border-color: #ffffff;
+    }
+}
+
+// ─── Multi Image Preview Grid ────────────────────────────────
+.imagePreviewGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    width: 100%;
+    align-items: center;
+}
+
+.imagePreviewItem {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.uploadAddMore {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #555;
+    padding: 8px;
+    cursor: pointer;
+}

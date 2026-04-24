@@ -2,115 +2,103 @@ import productModel from '../models/product.model.js'
 import userModel from '../models/user.model.js'
 import { imagekit } from '../utils/imagekit.js'
 
+// ── Helper: upload files via imagekit ───────────────────────────
+async function uploadFiles(files, folder) {
+    return Promise.all(files.map(file =>
+        imagekit.upload({
+            file: file.buffer,
+            fileName: Date.now() + '-' + file.originalname,
+            folder
+        })
+    ))
+}
+
+// ── Helper: parse attributes from req.body ───────────────────────
+// Handles attributes[color]=red, attributes[size]=XL etc.
+function parseAttributes(body) {
+    const attributes = new Map()
+    for (const key of Object.keys(body)) {
+        const match = key.match(/^attributes\[(.+)\]$/)
+        if (match) {
+            const attrKey = match[1].toLowerCase().trim()
+            const attrVal = body[key].trim()
+            if (attrKey && attrVal) attributes.set(attrKey, attrVal)
+        }
+    }
+    return attributes
+}
 
 export async function createProductController(req, res) {
-
     try {
-
-
         const seller = req.user
-        const { title, description, priceAmount, images } = req.body
-        if (req.files) {
-            const images = await Promise.all(req.files.map(async (file) => {
-                const uploadImage = await imagekit.upload({
-                    file: file.buffer,
-                    fileName: Date.now() + "-" + file.originalname,
-                    folder: "snitch/products"
-                })
-                return uploadImage
-            }))
-            const product = await productModel.create({
-                title,
-                description,
-                price: priceAmount,
-                images: images,
-                seller: seller._id
-            })
-            return res.status(201).json({
-                message: "Product created successfully",
-                product
-            })
+        const { title, description, priceAmount } = req.body
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'At least one image is required' })
         }
 
+        const images = await uploadFiles(req.files, 'snitch/products')
 
-
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: err.message
+        const product = await productModel.create({
+            title,
+            description,
+            price: priceAmount,
+            images: images.map(img => ({ url: img.url, fileId: img.fileId })),
+            seller: seller._id
         })
+
+        return res.status(201).json({ message: 'Product created successfully', product })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
-
-
 }
+
 export async function getSellerProduct(req, res) {
     try {
-        const seller = req.user
-
-        const products = await productModel.find({ seller: seller._id })
-        return res.status(200).json({
-            message: "Products fetched successfully",
-            products
-        })
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: err.message
-        })
+        const products = await productModel.find({ seller: req.user._id })
+        return res.status(200).json({ message: 'Products fetched successfully', products })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
 }
 
 export async function addVarient(req, res) {
     try {
-        const productId = req.params.productId
-        const { price, stock } = req.body
-        const attributes = new Map()
-if (req.body['attributes[color]']) attributes.set('color', req.body['attributes[color]'])
-if (req.body['attributes[size]']) attributes.set('size', req.body['attributes[size]'])
+        const { productId } = req.params
+
+         console.log('BODY:', req.body)      // ye add karo
+        console.log('FILES:', req.files)    // ye add karo
+        // FormData se sab kuch string aata hai — explicitly Number mein convert karo
+        const price = Number(req.body.price)
+        const stock = Number(req.body.stock)
+
+        if (!req.body.price || isNaN(price)) {
+            return res.status(400).json({ message: 'Valid price is required' })
+        }
+        if (req.body.stock === undefined || req.body.stock === '' || isNaN(stock)) {
+            return res.status(400).json({ message: 'Valid stock is required' })
+        }
 
         const product = await productModel.findById(productId)
-        if (!product) {
-            return res.status(404).json({
-                message: "Product not found"
-            })
-        }
-
+        if (!product) return res.status(404).json({ message: 'Product not found' })
         if (product.seller.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                message: "Unauthorized"
-            })
+            return res.status(403).json({ message: 'Unauthorized' })
         }
 
-        const newVarient = {
-            price,
-            stock,
-         attributes
+        const attributes = parseAttributes(req.body)
+
+        const newVarient = { price, stock, attributes }
+
+        if (req.files && req.files.length > 0) {
+            const uploaded = await uploadFiles(req.files, 'snitch/variants')
+            newVarient.images = uploaded.map(img => ({ url: img.url, fileId: img.fileId }))
         }
 
-        if (req.files) {
-            const images = await Promise.all(req.files.map(async (file) => {
-                const uploadImage = await imagekit.upload({
-                    file: file.buffer,
-                    fileName: Date.now() + "-" + file.originalname,
-                    folder: "snitch/variants"
-                })
-                return uploadImage
-            }
-            ))
-            newVarient.images = images
-
-
-        }
         product.varient.push(newVarient)
         await product.save()
-        res.status(201).json({
-            message: "Varient added successfully",
-            product
-        })
 
-    }
-    catch (err) {
-
+        return res.status(201).json({ message: 'Variant added successfully', product })
+    } catch (err) {
         return res.status(500).json({ message: err.message })
     }
 }
@@ -118,123 +106,80 @@ if (req.body['attributes[size]']) attributes.set('size', req.body['attributes[si
 export async function editVariant(req, res) {
     try {
         const { productId, variantId } = req.params
-        const { price, stock, attributes } = req.body
+
         const product = await productModel.findById(productId)
-        if (!product) {
-            return res.status(404).json({
-                message: "Product not found"
-            })
-      }
-      if (product.seller.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                message: "Unauthorized"
-            })
-            const variant = product.varient.id(variantId)
-            if (!variant) {
-                return res.status(404).json({
-                    message: "Variant not found"
-                })
-            }
-            if (price) variant.price = price
-            if (stock) variant.stock = stock
-            if (attributes) variant.attributes = attributes
+        if (!product) return res.status(404).json({ message: 'Product not found' })
 
-            if (req.files) {
-                const images = await Promise.all(req.files.map(async (file) => {
-                    const uploadImage = await imagekit.upload({
-                        file: file.buffer,
-                        fileName: Date.now() + "-" + file.originalname,
-                        folder: "snitch/variants"
-                    })
-                    return uploadImage
-                }))
-
-                variant.images = images
-      
-            }
-            await product.save()
-            return res.status(200).json({
-                message: "Variant updated successfully",
-                product
-            })
-      
-
+        // ✅ Fixed: auth check BEFORE rest of logic, no code buried inside return block
+        if (product.seller.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Unauthorized' })
         }
-    }
 
-        catch (err) {
-            return res.status(500).json({ message: err.message })
+        const variant = product.varient.id(variantId)
+        if (!variant) return res.status(404).json({ message: 'Variant not found' })
+
+        const { price, stock } = req.body
+
+        if (price !== undefined && price !== '') variant.price = Number(price)
+        if (stock !== undefined && stock !== '') variant.stock = Number(stock)
+
+        // Update attributes dynamically — merge with existing
+        const incoming = parseAttributes(req.body)
+        if (incoming.size > 0) {
+            // Merge: keep existing attrs, override/add incoming ones
+            incoming.forEach((val, key) => variant.attributes.set(key, val))
         }
+
+        if (req.files && req.files.length > 0) {
+            const uploaded = await uploadFiles(req.files, 'snitch/variants')
+            variant.images = uploaded.map(img => ({ url: img.url, fileId: img.fileId }))
+        }
+
+        await product.save()
+        return res.status(200).json({ message: 'Variant updated successfully', product })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
+}
 
 export async function deleteVariant(req, res) {
     try {
         const { productId, variantId } = req.params
+
         const product = await productModel.findById(productId)
-        if (!product) {
-            return res.status(404).json({   
-                message: "Product not found" 
-            })
+        if (!product) return res.status(404).json({ message: 'Product not found' })
 
-        }
         if (product.seller.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                message: "Unauthorized"
-            })
+            return res.status(403).json({ message: 'Unauthorized' })
         }
-        const variant = product.varient.id(variantId)
-        if (!variant) {
-            return res.status(404).json({
-                message: "Variant not found"
-            })
-        }
-        product.varient.remove(variantId)
-        await product.save()
-        return res.status(200).json({
-            message: "Variant deleted successfully",
-            product
-        })
 
-    }    catch (err) {
+        const variant = product.varient.id(variantId)
+        if (!variant) return res.status(404).json({ message: 'Variant not found' })
+
+        variant.deleteOne()
+        await product.save()
+
+        return res.status(200).json({ message: 'Variant deleted successfully', product })
+    } catch (err) {
         return res.status(500).json({ message: err.message })
-    }   
+    }
 }
 
 export async function getAllProducts(req, res) {
     try {
         const products = await productModel.find()
-        return res.status(200).json({
-            message: "Products fetched successfully",
-            products
-        })
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: err.message
-        })
+        return res.status(200).json({ message: 'Products fetched successfully', products })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
 }
 
-
-
 export async function getProductDetail(req, res) {
     try {
-        const productId = req.params.productId
-        const product = await productModel.findById(productId)
-        if (!product) {
-            return res.status(404).json({
-                message: "Product not found"
-            })
-        }
-        return res.status(200).json({
-            message: "Product fetched successfully",
-            product
-        })
-
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: err.message
-        })
+        const product = await productModel.findById(req.params.productId)
+        if (!product) return res.status(404).json({ message: 'Product not found' })
+        return res.status(200).json({ message: 'Product fetched successfully', product })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
     }
 }

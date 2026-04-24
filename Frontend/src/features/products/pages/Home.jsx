@@ -27,7 +27,7 @@ const Home = () => {
     return (
       <div className={styles.loadingOverlay}>
         <div className={styles.pulseContainer}>
-          <span className={styles.pulseText}>INITIALIZING_GALLERY...</span>
+          <span className={styles.pulseText}>INITIALIZING_SYSTEM...</span>
           <div className={styles.progressBar}>
             <div className={styles.progressFill}></div>
           </div>
